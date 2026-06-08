@@ -1,0 +1,81 @@
+from pathlib import Path
+
+import pytest
+
+from filemind.classification.classifier import classify_file, guess_mime_type, detect_text_in_image
+from filemind.core.models import FileType
+
+
+def test_guess_mime_type_returns_expected_type(tmp_path: Path) -> None:
+    path = tmp_path / "photo.jpg"
+    path.write_bytes(b"dummy")
+
+    mime_type = guess_mime_type(path)
+
+    assert mime_type == "image/jpeg"
+
+
+def test_classify_real_image(tmp_path: Path) -> None:
+    path = tmp_path / "photo.jpg"
+    path.write_bytes(b"dummy")
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.REAL_IMAGE
+    assert result.file_info.path == path
+    assert result.confidence >= 0.5
+
+
+def test_classify_document_image(tmp_path: Path) -> None:
+    path = tmp_path / "scan.tiff"
+    path.write_bytes(b"dummy")
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.DOCUMENT_IMAGE
+    assert result.confidence == pytest.approx(0.75)
+
+
+def test_classify_text_document(tmp_path: Path) -> None:
+    path = tmp_path / "report.pdf"
+    path.write_bytes(b"dummy")
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.TEXT_DOCUMENT
+    assert result.confidence == pytest.approx(0.98)
+
+
+def test_classify_archive(tmp_path: Path) -> None:
+    path = tmp_path / "archive.zip"
+    path.write_bytes(b"dummy")
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.ARCHIVES
+    assert result.confidence == pytest.approx(0.98)
+
+
+def test_detect_text_in_image_uses_ocr(monkeypatch: "pytest.MonkeyPatch", tmp_path: Path) -> None:
+    scan = tmp_path / "invoice_scan.jpg"
+    scan.write_bytes(b"dummy")
+
+    def fake_extract_text_from_image(path: Path) -> str:
+        assert path == scan
+        return "Invoice number 123"
+
+    monkeypatch.setattr("filemind.classification.classifier._extract_text_from_image", fake_extract_text_from_image)
+
+    score = detect_text_in_image(scan)
+
+    assert score == pytest.approx(30.0)
+
+
+def test_detect_text_in_image_stub_behaviour(tmp_path: Path) -> None:
+    scan = tmp_path / "invoice_scan.jpg"
+    scan.write_bytes(b"dummy")
+
+    score = detect_text_in_image(scan)
+
+    assert score >= 20.0
+    assert score <= 100.0

@@ -1,0 +1,84 @@
+# filemind - Intelligent File Organization with AI
+# Configuration File
+
+# Logging System
+logging:
+  log_dir: ".filemind/logs"           # Directory for log files
+  level: "INFO"                        # Root log level (DEBUG, INFO, WARNING, ERROR)
+  retention_days: 7                    # Keep log files for 7 days
+  console_enabled: true                # Print to console
+  console_level: "WARNING"             # Only print warnings and errors to console
+
+# Daemon Configuration
+daemon:
+  input_directories:                   # Directories to watch for new files
+    - "/media/storage_main/syncthing"
+    - "/media/storage_main/altes_backup"
+  poll_interval: 3600                  # Check for new files every 3600 minutes
+
+# Storage Configuration
+storage:
+  base_media_path: "/media/storage_media"                  # Base path for organized media files
+  base_documents_path: "/media/storage_main/scanner"       # Path where to move the documents
+  max_files_per_folder: 3000                               # Maximum files per folder
+
+# Classification Rules
+classification:
+  # Image extensions (REAL_IMAGE)
+  image_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".bmp"
+    - ".webp"
+    - ".tiff"
+    - ".heic"
+
+  # Document image extensions (DOCUMENT_IMAGE)
+  document_image_extensions:
+    - ".pdf"
+    - ".tif"
+
+  # Text document extensions (TEXT_DOCUMENT)
+  text_document_extensions:
+    - ".pdf"
+    - ".docx"
+    - ".doc"
+    - ".xlsx"
+    - ".xls"
+    - ".pptx"
+    - ".txt"
+    - ".rtf"
+
+  # Video extensions (VIDEO)
+  video_extensions:
+    - ".mp4"
+    - ".avi"
+    - ".mkv"
+    - ".mov"
+    - ".wmv"
+    - ".flv"
+    - ".webm"
+    - ".m4v"
+
+  # Audio extensions (AUDIO)
+  audio_extensions:
+    - ".mp3"
+    - ".wav"
+    - ".flac"
+    - ".aac"
+    - ".ogg"
+    - ".wma"
+    - ".m4a"
+    - ".aiff"
+
+  # Archive extensions (ARCHIVES)
+  archive_extensions:
+    - ".zip"
+    - ".rar"
+    - ".7z"
+    - ".tar"
+    - ".gz"
+    - ".bz2"
+    - ".xz"

@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.12, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Users\ricom\git\filemind
+collected 7 items
+
+tests\test_classifier.py .......                                         [100%]
+
+============================== warnings summary ===============================
+tests/test_classifier.py::test_classify_real_image
+  C:\Users\ricom\AppData\Local\Programs\Python\Python313\Lib\site-packages\easyocr\detection.py:81: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
+
+tests/test_classifier.py::test_classify_real_image
+tests/test_classifier.py::test_classify_real_image
+  C:\Users\ricom\AppData\Local\Programs\Python\Python313\Lib\site-packages\torch\ao\quantization\quantize.py:570: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    convert(model, mapping, inplace=True)
+
+tests/test_classifier.py::test_classify_real_image
+  C:\Users\ricom\AppData\Local\Programs\Python\Python313\Lib\site-packages\easyocr\recognition.py:177: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 7 passed, 4 warnings in 4.51s ========================
