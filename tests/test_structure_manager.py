@@ -1,7 +1,13 @@
 from pathlib import Path
 
+import pytest
+
 from filemind.storage import structure_manager
-from filemind.storage.structure_manager import get_base_folders, get_target_subfolder, ensure_directory, get_folder_stats
+from filemind.storage.structure_manager import (
+    get_base_folders,
+    get_folder_stats,
+    get_target_subfolder,
+)
 
 
 def test_get_target_subfolder_creates_first_folder(tmp_path: Path) -> None:
@@ -14,7 +20,9 @@ def test_get_target_subfolder_creates_first_folder(tmp_path: Path) -> None:
     assert target.parent == base_folder
 
 
-def test_get_target_subfolder_rolls_over_when_folder_full(tmp_path: Path, monkeypatch: "pytest.MonkeyPatch") -> None:
+def test_get_target_subfolder_rolls_over_when_folder_full(
+    tmp_path: Path, monkeypatch: "pytest.MonkeyPatch"
+) -> None:
     monkeypatch.setattr(structure_manager, "MAX_FILES_PER_SUBFOLDER", 3)
 
     base_folder = tmp_path / "Pictures"
@@ -47,4 +55,3 @@ def test_get_folder_stats_returns_counts(tmp_path: Path) -> None:
     stats = get_folder_stats(pictures)
 
     assert stats == {"2026_01": 2}
-

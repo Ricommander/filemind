@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Optional
 
 from easyocr import Reader
+
 from filemind.logging_utils.logger import get_logger
 
 logger = get_logger(__name__)

@@ -1,0 +1,8 @@
+.filemind
+.pytest_cache
+__pycache__
+*.pyc
+*/__pycache__/
+tests/documents
+tests/media
+.ruff_cache

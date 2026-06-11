@@ -12,15 +12,27 @@ logging:
 # Daemon Configuration
 daemon:
   input_directories:                   # Directories to watch for new files
-    - "/media/storage_main/syncthing"
-    - "/media/storage_main/altes_backup"
-  poll_interval: 3600                  # Check for new files every 3600 minutes
+    - path: "/media/storage_main/syncthing"
+      action: "copy"
+    - path: "/media/storage_main/altes_backup"
+      action: "move"
+  poll_interval: 3600                  # Check for new files every 3600 seconds (1 hour)
 
 # Storage Configuration
 storage:
   base_media_path: "/media/storage_media"                  # Base path for organized media files
   base_documents_path: "/media/storage_main/scanner"       # Path where to move the documents
   max_files_per_folder: 3000                               # Maximum files per folder
+  reinit_hash_store: false                                 # Whether to reinitialize the hash store on startup (WARNING: This will cause all files to be reprocessed)
+  hash_db_path: ".filemind/hash_store.db"                  # SQLite database for SHA-256 deduplication
+
+# AI Naming (Ollama)
+ai:
+  enabled: true                        # Enable AI-powered smart naming for photos
+  provider: "ollama"                   # Currently only "ollama" is supported
+  model: "llava:7b"                    # Vision model used to describe images and derive names
+  url: "http://localhost:11434"        # Base URL of the local Ollama server
+  timeout: 120                         # Request timeout in seconds (CPU inference can be slow)
 
 # Classification Rules
 classification:
@@ -35,16 +47,12 @@ classification:
     - ".tiff"
     - ".heic"
 
-  # Document image extensions (DOCUMENT_IMAGE)
-  document_image_extensions:
-    - ".pdf"
-    - ".tif"
-
   # Text document extensions (TEXT_DOCUMENT)
   text_document_extensions:
     - ".pdf"
     - ".docx"
     - ".doc"
+    - ".odt"
     - ".xlsx"
     - ".xls"
     - ".pptx"

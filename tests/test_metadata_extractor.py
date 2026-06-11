@@ -1,8 +1,5 @@
 import datetime
 from types import SimpleNamespace
-from pathlib import Path
-
-import pytest
 
 from filemind.integrations.metadata_extractor import get_file_creation_date
 

@@ -12,4 +12,3 @@ A modern daemon-based file organization system with support for:
 
 __version__ = "0.1.0"
 __author__ = "filemind"
-

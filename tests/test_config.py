@@ -1,20 +1,18 @@
 from pathlib import Path
 
-from filemind.config import get_config, get_config_file, get_section, reload_config, set_config_file
+from filemind.config import get_config_file, get_section, reload_config, set_config_file
 
 
 def test_config_loads_sections_from_file(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
-    config_path.write_text(
-        """
+    config_path.write_text("""
 logging:
   level: DEBUG
   console_enabled: false
 
 daemon:
   poll_interval: 123
-"""
-    )
+""")
 
     set_config_file(config_path)
     reload_config()

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from filemind.classification.classifier import classify_file, guess_mime_type, detect_text_in_image
+from filemind.classification.classifier import classify_file, detect_text_in_image, guess_mime_type
 from filemind.core.models import FileType
 
 
@@ -46,6 +46,16 @@ def test_classify_text_document(tmp_path: Path) -> None:
     assert result.confidence == pytest.approx(0.98)
 
 
+def test_classify_odt_as_text_document(tmp_path: Path) -> None:
+    path = tmp_path / "document.odt"
+    path.write_bytes(b"dummy")
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.TEXT_DOCUMENT
+    assert result.confidence == pytest.approx(0.98)
+
+
 def test_classify_archive(tmp_path: Path) -> None:
     path = tmp_path / "archive.zip"
     path.write_bytes(b"dummy")
@@ -56,6 +66,34 @@ def test_classify_archive(tmp_path: Path) -> None:
     assert result.confidence == pytest.approx(0.98)
 
 
+def test_classify_file_uses_config_extensions(
+    monkeypatch: "pytest.MonkeyPatch", tmp_path: Path
+) -> None:
+    path = tmp_path / "scan.TIFF"
+    path.write_bytes(b"dummy")
+
+    monkeypatch.setattr(
+        "filemind.config.get_section",
+        lambda section, default=None: {
+            "image_extensions": [".TIFF"],
+            "text_document_extensions": [".pdf"],
+            "video_extensions": [".mp4"],
+            "audio_extensions": [".mp3"],
+            "archive_extensions": [".zip"],
+        },
+    )
+
+    monkeypatch.setattr(
+        "filemind.classification.classifier._extract_text_from_image",
+        lambda path: "Invoice number 123 with several words",
+    )
+
+    result = classify_file(path)
+
+    assert result.file_type == FileType.DOCUMENT_IMAGE
+    assert result.confidence == pytest.approx(0.75)
+
+
 def test_detect_text_in_image_uses_ocr(monkeypatch: "pytest.MonkeyPatch", tmp_path: Path) -> None:
     scan = tmp_path / "invoice_scan.jpg"
     scan.write_bytes(b"dummy")
@@ -64,7 +102,9 @@ def test_detect_text_in_image_uses_ocr(monkeypatch: "pytest.MonkeyPatch", tmp_pa
         assert path == scan
         return "Invoice number 123"
 
-    monkeypatch.setattr("filemind.classification.classifier._extract_text_from_image", fake_extract_text_from_image)
+    monkeypatch.setattr(
+        "filemind.classification.classifier._extract_text_from_image", fake_extract_text_from_image
+    )
 
     score = detect_text_in_image(scan)
 

@@ -1,0 +1,32 @@
+# systemd unit for the filemind daemon.
+# Install via deploy/install.sh or manually:
+#   sudo cp deploy/filemind.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now filemind
+
+[Unit]
+Description=filemind - Intelligent File Organization with AI
+Documentation=https://github.com/Ricommander/filemind
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=filemind
+Group=filemind
+WorkingDirectory=/opt/filemind
+ExecStart=/opt/filemind/.venv/bin/python /opt/filemind/main.py --config /etc/filemind/config.yaml
+Restart=on-failure
+RestartSec=10
+# Give the daemon time to finish processing the current file on shutdown
+TimeoutStopSec=120
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/filemind /media/storage_media /media/storage_main
+
+[Install]
+WantedBy=multi-user.target

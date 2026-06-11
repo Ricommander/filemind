@@ -1,0 +1,89 @@
+# filemind - Intelligent File Organization with AI
+# Configuration File
+
+# Logging System
+logging:
+  log_dir: ".filemind/logs"           # Directory for log files
+  level: "INFO"                        # Root log level (DEBUG, INFO, WARNING, ERROR)
+  retention_days: 7                    # Keep log files for 7 days
+  console_enabled: true                # Print to console
+  console_level: "WARNING"             # Only print warnings and errors to console
+
+# Daemon Configuration
+daemon:
+  input_directories:                   # Directories to watch for new files
+    - path: "tests/input"
+      action: "copy"
+  poll_interval: 5                  # Check for new files every 5 seconds
+
+# Storage Configuration
+storage:
+  base_media_path: "tests/media"                  # Base path for organized media files
+  base_documents_path: "tests/documents"       # Path where to move the documents
+  max_files_per_folder: 3000                               # Maximum files per folder
+  reinit_hash_store: true                                 # Whether to reinitialize the hash store on startup (WARNING: This will cause all files to be reprocessed)
+
+# AI Naming (Ollama)
+ai:
+  enabled: true
+  provider: "ollama"
+  model: "llava:7b"
+  url: "http://localhost:11434"
+  timeout: 120
+
+# Classification Rules
+classification:
+  # Image extensions (REAL_IMAGE)
+  image_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".bmp"
+    - ".webp"
+    - ".tiff"
+    - ".heic"
+
+  # Text document extensions (TEXT_DOCUMENT)
+  text_document_extensions:
+    - ".pdf"
+    - ".docx"
+    - ".doc"
+    - ".odt"
+    - ".xlsx"
+    - ".xls"
+    - ".pptx"
+    - ".txt"
+    - ".rtf"
+
+  # Video extensions (VIDEO)
+  video_extensions:
+    - ".mp4"
+    - ".avi"
+    - ".mkv"
+    - ".mov"
+    - ".wmv"
+    - ".flv"
+    - ".webm"
+    - ".m4v"
+
+  # Audio extensions (AUDIO)
+  audio_extensions:
+    - ".mp3"
+    - ".wav"
+    - ".flac"
+    - ".aac"
+    - ".ogg"
+    - ".wma"
+    - ".m4a"
+    - ".aiff"
+
+  # Archive extensions (ARCHIVES)
+  archive_extensions:
+    - ".zip"
+    - ".rar"
+    - ".7z"
+    - ".tar"
+    - ".gz"
+    - ".bz2"
+    - ".xz"

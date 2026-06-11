@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import yaml
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
+
+import yaml
 
 DEFAULT_CONFIG_FILE = Path.cwd() / "config.yaml"
 

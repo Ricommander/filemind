@@ -18,8 +18,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
-from filemind.core.models import FileInfo, FileType, ClassificationResult
-
+from filemind.config import get_section
+from filemind.core.models import ClassificationResult, FileInfo, FileType
 
 # Bekannte Erweiterungen gruppiert nach Typ
 _IMAGE_EXTENSIONS: set[str] = {
@@ -35,7 +35,7 @@ _IMAGE_EXTENSIONS: set[str] = {
     "gif",
 }
 
-_TEXT_EXTENSIONS: set[str] = {"pdf", "doc", "docx", "txt", "md", "rtf"}
+_TEXT_EXTENSIONS: set[str] = {"pdf", "doc", "docx", "odt", "txt", "md", "rtf"}
 
 _VIDEO_EXTENSIONS: set[str] = {"mp4", "mov", "mkv", "avi", "webm"}
 
@@ -62,6 +62,31 @@ def _ext_of(path: Path) -> str:
     """
 
     return path.suffix.lstrip(".").lower()
+
+
+def _normalize_extensions(extensions: Iterable[str]) -> set[str]:
+    return {
+        extension.strip().lstrip(".").lower()
+        for extension in extensions
+        if isinstance(extension, str) and extension.strip()
+    }
+
+
+def _get_classification_extensions() -> dict[str, set[str]]:
+    classification = get_section("classification", default={})
+
+    return {
+        "image": _normalize_extensions(classification.get("image_extensions", []))
+        or _IMAGE_EXTENSIONS,
+        "text_document": _normalize_extensions(classification.get("text_document_extensions", []))
+        or _TEXT_EXTENSIONS,
+        "video": _normalize_extensions(classification.get("video_extensions", []))
+        or _VIDEO_EXTENSIONS,
+        "audio": _normalize_extensions(classification.get("audio_extensions", []))
+        or _AUDIO_EXTENSIONS,
+        "archive": _normalize_extensions(classification.get("archive_extensions", []))
+        or _ARCHIVE_EXTENSIONS,
+    }
 
 
 def guess_mime_type(path: Path) -> str:
@@ -125,7 +150,15 @@ def detect_text_in_image(path: Path) -> float:
         return score
 
     # Heuristische Hinweise im Dateinamen
-    doc_indicators: Iterable[str] = ("scan", "scanned", "document", "doc", "receipt", "invoice", "page")
+    doc_indicators: Iterable[str] = (
+        "scan",
+        "scanned",
+        "document",
+        "doc",
+        "receipt",
+        "invoice",
+        "page",
+    )
     if any(token in name for token in doc_indicators):
         return 30.0
 
@@ -169,41 +202,43 @@ def classify_file(path: Path) -> ClassificationResult:
     path = Path(path)
     file_info = _build_file_info(path)
     ext = file_info.extension
+    extensions = _get_classification_extensions()
 
     # Textdokumente
-    if ext in _TEXT_EXTENSIONS:
-        return ClassificationResult(file_info=file_info, file_type=FileType.TEXT_DOCUMENT, confidence=0.98)
+    if ext in extensions["text_document"]:
+        return ClassificationResult(
+            file_info=file_info, file_type=FileType.TEXT_DOCUMENT, confidence=0.98
+        )
 
     # Videos
-    if ext in _VIDEO_EXTENSIONS:
+    if ext in extensions["video"]:
         return ClassificationResult(file_info=file_info, file_type=FileType.VIDEO, confidence=0.98)
 
     # Audio
-    if ext in _AUDIO_EXTENSIONS:
+    if ext in extensions["audio"]:
         return ClassificationResult(file_info=file_info, file_type=FileType.AUDIO, confidence=0.9)
 
     # Archive
-    if ext in _ARCHIVE_EXTENSIONS:
-        return ClassificationResult(file_info=file_info, file_type=FileType.ARCHIVES, confidence=0.98)
+    if ext in extensions["archive"]:
+        return ClassificationResult(
+            file_info=file_info, file_type=FileType.ARCHIVES, confidence=0.98
+        )
 
     # Bilder (real_image vs. document_image)
-    if ext in _IMAGE_EXTENSIONS:
+    if ext in extensions["image"]:
         text_confidence = detect_text_in_image(path)
 
         if text_confidence > 20.0:
-            # Wahrscheinlich ein gescanntes Dokument oder ähnlich
             return ClassificationResult(
                 file_info=file_info,
                 file_type=FileType.DOCUMENT_IMAGE,
                 confidence=0.75,
             )
-        else:
-            # Normale Fotografie
-            return ClassificationResult(
-                file_info=file_info,
-                file_type=FileType.REAL_IMAGE,
-                confidence=0.9,
-            )
+        return ClassificationResult(
+            file_info=file_info,
+            file_type=FileType.REAL_IMAGE,
+            confidence=0.9,
+        )
 
     # Fallback: OTHER
     return ClassificationResult(

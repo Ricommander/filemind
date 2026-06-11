@@ -5,13 +5,13 @@ A modern daemon-based file organization system that automatically classifies, pr
 ## Features
 
 - 🤖 **Intelligent Classification**: Automatically detects file types (images, documents, videos, audio, archives)
-- 📄 **OCR Support**: Extract text from document images (Stub, expandable)
-- 📋 **Paperless NGX Integration**: Upload documents directly to your Paperless instance
+- 📄 **OCR Support**: Extract text from document images
 - 🔍 **Binary Deduplication**: Detect and prevent duplicate files using SHA-256 hashing
-- 🏷️ **Smart Naming**: AI-powered file naming (configurable, OpenAI/Hugging Face ready)
-- 📁 **Organized Storage**: Year-based directory structures (YYYY_NN format, max 3000 files per folder)
+- 🏷️ **Smart Naming**: AI-powered file naming (first describes the image, then finds the best name based on the description of the image)
+- 📁 **Organized Storage**: Year-based directory structures (YYYY_NN\Country\City format, max 3000 files per folder)
 - 🧵 **Thread-Safe**: Concurrent processing with proper locking mechanisms
 - 📊 **Comprehensive Logging**: Rotating file handlers with configurable retention
+- **GPS reverse geocoding**: Finds the correct country and city of an image if GPS coordinates are present in the metadata.
 
 ## Architecture
 
@@ -25,12 +25,12 @@ Input Directory
 [3] Deduplication Check (SHA-256 Hash)
     ↓
 [4] Type-Specific Processing
-    ├─ Documents → OCR (optional) → Paperless NGX
-    ├─ Images → Smart Naming (optional) → Storage
+    ├─ Documents → OCR → Paperless NGX
+    ├─ Images → Smart Naming → Storage
     ├─ Videos/Audio/Archives → Metadata Extraction → Storage
     └─ Others → Storage
     ↓
-[5] Organized Output (YYYY_NN folders)
+[5] Organized Output (YYYY_NN\Country\City folders)
 ```
 
 ## Installation
@@ -38,6 +38,10 @@ Input Directory
 ### Prerequisites
 - Python 3.9+
 - pip or poetry
+- [Ollama](https://ollama.com) with a vision model for AI naming (optional):
+  ```bash
+  ollama pull llava:7b
+  ```
 
 ### Setup
 
@@ -63,43 +67,129 @@ nano config.yaml  # Edit with your settings
 mkdir input
 ```
 
+### Install as a systemd Service (Linux Server)
+
+filemind is designed to run as a daemon that starts with the server.
+The repository ships a ready-to-use systemd unit and installer:
+
+```bash
+sudo ./deploy/install.sh
+```
+
+The installer:
+1. creates the system user `filemind`,
+2. copies the project to `/opt/filemind` and creates a virtualenv there,
+3. installs the configuration to `/etc/filemind/config.yaml` (existing config is kept),
+4. installs and enables the systemd unit `filemind` (autostart on boot).
+
+Useful commands:
+
+```bash
+journalctl -u filemind -f          # follow logs
+systemctl status filemind          # service status
+systemctl restart filemind         # restart after config changes
+```
+
+The unit file lives in [deploy/filemind.service](deploy/filemind.service).
+Adjust `ReadWritePaths` there if your storage paths differ from the defaults.
+
 ## Configuration
 
 Edit `config.yaml`:
 
 ```yaml
-# Logging
+# filemind - Intelligent File Organization with AI
+# Configuration File
+
+# Logging System
 logging:
-  log_dir: ".filemind/logs"
-  level: "INFO"
-  retention_days: 7
+  log_dir: ".filemind/logs"           # Directory for log files
+  level: "INFO"                        # Root log level (DEBUG, INFO, WARNING, ERROR)
+  retention_days: 7                    # Keep log files for 7 days
+  console_enabled: true                # Print to console
+  console_level: "WARNING"             # Only print warnings and errors to console
 
-# Daemon
+# Daemon Configuration
 daemon:
-  input_directories:
-    - "input"
-  poll_interval: 5  # seconds
+  input_directories:                   # Directories to watch for new files
+    - path: "/media/storage_main/syncthing"
+      action: "copy"
+    - path: "/media/storage_main/altes_backup"
+      action: "move"
+  poll_interval: 3600                  # Check for new files every 3600 seconds (1 hour)
 
-# Storage
+# Storage Configuration
 storage:
-  base_path: "output"
-  max_files_per_subfolder: 3000
+  base_media_path: "/media/storage_media"                  # Base path for organized media files
+  base_documents_path: "/media/storage_main/scanner"       # Path where to move the documents
+  max_files_per_folder: 3000                               # Maximum files per folder
+  reinit_hash_store: false                                 # Whether to reinitialize the hash store on startup (WARNING: This will cause all files to be reprocessed)
+  hash_db_path: ".filemind/hash_store.db"                  # SQLite database for SHA-256 deduplication
 
-# Paperless NGX (optional)
-paperless:
-  url: "http://localhost:8000"
-  token: "YOUR_API_TOKEN"
-  enabled: false
-
-# OCR (optional, Stub)
-ocr:
-  enabled: false
-  provider: "stub"  # "tesseract", "easyocr", etc.
-
-# AI Naming (optional, Stub)
+# AI Naming (Ollama)
 ai:
-  enabled: false
-  provider: "stub"  # "openai", "huggingface", etc.
+  enabled: true                        # Enable AI-powered smart naming for photos
+  provider: "ollama"                   # Currently only "ollama" is supported
+  model: "llava:7b"                    # Vision model used to describe images and derive names
+  url: "http://localhost:11434"        # Base URL of the local Ollama server
+  timeout: 120                         # Request timeout in seconds (CPU inference can be slow)
+
+# Classification Rules
+classification:
+  # Image extensions (REAL_IMAGE)
+  image_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".bmp"
+    - ".webp"
+    - ".tiff"
+    - ".heic"
+
+  # Text document extensions (TEXT_DOCUMENT)
+  text_document_extensions:
+    - ".pdf"
+    - ".docx"
+    - ".doc"
+    - ".odt"
+    - ".xlsx"
+    - ".xls"
+    - ".pptx"
+    - ".txt"
+    - ".rtf"
+
+  # Video extensions (VIDEO)
+  video_extensions:
+    - ".mp4"
+    - ".avi"
+    - ".mkv"
+    - ".mov"
+    - ".wmv"
+    - ".flv"
+    - ".webm"
+    - ".m4v"
+
+  # Audio extensions (AUDIO)
+  audio_extensions:
+    - ".mp3"
+    - ".wav"
+    - ".flac"
+    - ".aac"
+    - ".ogg"
+    - ".wma"
+    - ".m4a"
+    - ".aiff"
+
+  # Archive extensions (ARCHIVES)
+  archive_extensions:
+    - ".zip"
+    - ".rar"
+    - ".7z"
+    - ".tar"
+    - ".gz"
+    - ".bz2"
+    - ".xz"
 ```
 
 ## Usage
@@ -121,7 +211,7 @@ python -m filemind.main --input-dir /path/to/watch
 
 The system automatically classifies files into these categories:
 
-| Type | Extensions | Behavior |
+| Type | Extensions | Behavior  |
 |------|-----------|----------|
 | **Real Image** | jpg, png, gif, etc. | Smart naming, deduplication, organized storage |
 | **Document Image** | PDF (scanned), TIF | OCR (optional), Paperless (optional), storage |
@@ -138,7 +228,7 @@ Files are organized in the following structure:
 ```
 output/
 ├── Pictures/
-│   ├── 2026_01/  (up to 3000 files)
+│   ├── 2026_01/Deutschland/Hodenhagen  (up to 3000 files)
 │   ├── 2026_02/
 │   └── ...
 ├── Documents/
@@ -174,46 +264,8 @@ output/
 
 ### System Modules
 
-- **`paperless.client`**: Paperless NGX API integration
 - **`logging.logger`**: Thread-safe rotating file logging
 - **`main`**: Daemon entry point and orchestration
-
-## Extending filemind
-
-### Add OCR Support
-
-Replace the stub in `integrations/ocr.py`:
-
-```python
-def ocr_to_text(path: Path) -> str:
-    # Implement with Tesseract, EasyOCR, PaddleOCR, etc.
-    import pytesseract
-    return pytesseract.image_to_string(str(path))
-```
-
-### Add AI Naming
-
-Replace the stub in `integrations/ai_naming.py`:
-
-```python
-def generate_smart_name(path: Path) -> str:
-    from openai import OpenAI
-    client = OpenAI()
-    
-    # Analyze file and generate name using GPT-4
-    response = client.chat.completions.create(...)
-    return response.choices[0].message.content
-```
-
-### Add Custom File Handlers
-
-Extend `routing/router.py`:
-
-```python
-elif file_type == FileType.CUSTOM:
-    logger.debug("Processing custom type")
-    # Add your custom logic here
-```
 
 ## Logging
 
@@ -264,8 +316,6 @@ filemind/
 │   └── metadata_extractor.py     # Metadata extraction
 ├── logging/
 │   └── logger.py                 # Logging setup
-├── paperless/
-│   └── client.py                 # Paperless NGX API
 ├── routing/
 │   └── router.py                 # Main routing logic
 ├── storage/
@@ -276,11 +326,6 @@ filemind/
 ```
 
 ## Troubleshooting
-
-### "Paperless connection refused"
-- Verify Paperless NGX is running: `curl http://localhost:8000/api/`
-- Check API token in `config.yaml`
-- Enable Paperless in config if not already
 
 ### "Duplicate not recognized"
 - Check `.filemind/hash_store.db` exists

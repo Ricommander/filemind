@@ -1,9 +1,0 @@
-2026-06-05 21:45:27 - root - INFO - filemind Logging System gestartet
-2026-06-05 21:46:34 - root - INFO - filemind Logging System gestartet
-2026-06-05 21:46:37 - easyocr.easyocr - WARNING - Using CPU. Note: This module is much faster with a GPU.
-2026-06-05 21:46:39 - filemind.integrations.ocr - INFO - OCR erfolgreich für 'hello_ocr.png' - erkannter Text-Länge: 9
-2026-06-05 21:46:39 - filemind.integrations.ocr - ERROR - Nicht unterstütztes Format: .txt
-2026-06-05 21:48:56 - root - INFO - filemind Logging System gestartet
-2026-06-05 21:48:59 - easyocr.easyocr - WARNING - Using CPU. Note: This module is much faster with a GPU.
-2026-06-05 21:49:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für 'hello_ocr.png' - erkannter Text-Länge: 9
-2026-06-05 21:49:00 - filemind.integrations.ocr - ERROR - Nicht unterstütztes Format: .txt
