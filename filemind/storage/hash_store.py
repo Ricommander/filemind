@@ -213,7 +213,8 @@ class HashStore:
             is_dup = result[0] > 0 if result else False
 
             if is_dup:
-                logger.info(f"Duplikat erkannt: {path.name} (Hash: {file_hash[:16]}...)")
+                # Nur DEBUG: die fachliche Meldung übernimmt der Router (einmalig)
+                logger.debug(f"Duplikat erkannt: {path.name} (Hash: {file_hash[:16]}...)")
                 # Aktualisiere Cache
                 with self._cache_lock:
                     if len(self._cache) >= DUPLICATE_CACHE_SIZE:
@@ -270,7 +271,9 @@ class HashStore:
                     self._cache.clear()
                 self._cache[file_hash] = str(path)
 
-            logger.info(
+            # Nur DEBUG: bei der Startup-Registrierung des Zielbestands würde
+            # INFO das Log mit einer Zeile pro Datei fluten
+            logger.debug(
                 f"Datei registriert: {path.name} (Hash: {file_hash[:16]}..., "
                 f"Größe: {file_size} bytes)"
             )

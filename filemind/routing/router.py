@@ -10,12 +10,12 @@ diese Funktionen nicht vorhanden sind, wird dies sauber geloggt.
 
 from __future__ import annotations
 
-import os
 import re
 import shutil
+import threading
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from filemind.classification.classifier import classify_file
 from filemind.config import get_config, get_section
@@ -23,6 +23,47 @@ from filemind.core.models import FileType
 from filemind.logging_utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+# Bereits erkannte Duplikate für die Laufzeit des Prozesses.
+# Key: Dateipfad, Value: (mtime, Größe) zum Erkennungszeitpunkt.
+# Verhindert, dass im Input-Ordner liegengebliebene Duplikate bei jedem
+# Poll-Durchgang erneut geloggt, gehasht und klassifiziert werden.
+# Ändert sich die Datei (mtime/Größe), wird sie erneut geprüft.
+_known_duplicates: Dict[str, Tuple[float, int]] = {}
+_known_duplicates_lock = threading.Lock()
+
+
+def _file_signature(path: Path) -> Optional[Tuple[float, int]]:
+    """Liefert (mtime, Größe) einer Datei oder None bei Fehlern."""
+    try:
+        stat = path.stat()
+        return (stat.st_mtime, stat.st_size)
+    except OSError:
+        return None
+
+
+def _is_known_duplicate(path: Path) -> bool:
+    """Prüft, ob die Datei in dieser Laufzeit bereits als Duplikat erkannt wurde."""
+    signature = _file_signature(path)
+    if signature is None:
+        return False
+    with _known_duplicates_lock:
+        return _known_duplicates.get(str(path)) == signature
+
+
+def _remember_duplicate(path: Path) -> None:
+    """Merkt sich ein erkanntes Duplikat für die restliche Laufzeit."""
+    signature = _file_signature(path)
+    if signature is None:
+        return
+    with _known_duplicates_lock:
+        _known_duplicates[str(path)] = signature
+
+
+def reset_duplicate_cache() -> None:
+    """Leert den Laufzeit-Cache der bereits gemeldeten Duplikate."""
+    with _known_duplicates_lock:
+        _known_duplicates.clear()
 
 
 def _get_output_dir_for_file_type(file_type: FileType) -> str:
@@ -77,7 +118,13 @@ def _handle_deduplication(file_info: "Any") -> bool:
         path = file_info.path
 
         if is_duplicate(path):
-            logger.warning(f"Duplikat erkannt: {path.name}")
+            # Einmalig pro Laufzeit melden; Folgedurchläufe des Daemons
+            # überspringen die Datei still (siehe _is_known_duplicate).
+            logger.warning(
+                f"Duplikat erkannt, wird übersprungen: {path.name} "
+                f"(wird in weiteren Durchläufen nicht erneut gemeldet)"
+            )
+            _remember_duplicate(path)
             # Nicht löschen; nur überspringen. Caller entscheidet weiteres Verhalten.
             return True
 
@@ -104,7 +151,7 @@ def _handle_storage(
     # - Bilder -> `storage.base_media_path\YYYY\<Country>\<City>\YYYY-MM-DD_name.ext`
     # - Andere Dateien ähnlich wie Bilder, Name aber nur aus Metadaten
     try:
-        from filemind.integrations.ai_naming import generate_smart_name
+        from filemind.integrations.ai_naming import generate_smart_name, truncate_stem
         from filemind.integrations.metadata_extractor import (
             get_country_city_from_file,
             get_file_creation_date,
@@ -136,28 +183,24 @@ def _handle_storage(
                     return candidate
                 idx += 1
 
-        # Helper: choose year folder with capacity logic
-        def _choose_year_folder(base: Path, year: str) -> Path:
-            # Try base/year, if too many files then year_1, year_2...
-            candidate = base / year
-            if not candidate.exists():
-                return candidate
+        # Helper: choose target folder with capacity logic
+        def _count_direct_files(p: Path) -> int:
+            # Nur direkt im Ordner liegende Dateien zählen; Unterordner zählen nicht.
+            if not p.exists():
+                return 0
+            return sum(1 for item in p.iterdir() if item.is_file())
 
-            def _count_recursive(p: Path) -> int:
-                count = 0
-                for root, _, files in os.walk(p):
-                    count += len(files)
-                return count
-
-            if _count_recursive(candidate) < max_files_per_folder:
-                return candidate
-            idx = 1
+        def _choose_target_dir(base: Path, year: str, rel_parts: Tuple[str, ...]) -> Path:
+            # max_files_per_folder gilt pro Ordner für direkt enthaltene Dateien.
+            # Ist der Zielordner (Jahres- oder Stadt-Ordner) voll, weicht die
+            # Ablage auf den nächsten Jahres-Suffix-Ordner aus
+            # (2026 -> 2026_1 -> 2026_2 ...).
+            idx = 0
             while True:
-                cand = base / f"{year}_{idx}"
-                if not cand.exists():
-                    return cand
-                if _count_recursive(cand) < max_files_per_folder:
-                    return cand
+                year_name = year if idx == 0 else f"{year}_{idx}"
+                candidate = base.joinpath(year_name, *rel_parts)
+                if _count_direct_files(candidate) < max_files_per_folder:
+                    return candidate
                 idx += 1
 
         # DOCUMENTS: verschiebe als Ganzes in base_docs
@@ -170,6 +213,7 @@ def _handle_storage(
                     f"Datei bereits in Dokumenten-Ziel vorhanden, überspringe: {path.name}"
                 )
                 register_file(path)
+                _remember_duplicate(path)
                 return True
 
             target = base_docs / path.name
@@ -227,20 +271,14 @@ def _handle_storage(
 
         # sanitize stem
         stem = str(stem)
-        stem = re.sub(r"[^a-z0-9_\-]+", "_", stem.lower()).strip("_")[:60]
+        stem = truncate_stem(re.sub(r"[^a-z0-9_\-]+", "_", stem.lower()).strip("_"))
         ext = path.suffix.lower()
 
-        # Build base year folder
-        year_folder = _choose_year_folder(base_media, year)
-        # Build nested country/city structure
+        # Build target dir: year (+ country/city), Kapazität gilt für den Zielordner
+        rel_parts: Tuple[str, ...] = ()
         if country:
-            if city:
-                target_dir = year_folder / country / city
-            else:
-                target_dir = year_folder / country
-        else:
-            # No country -> put directly into year folder
-            target_dir = year_folder
+            rel_parts = (country, city) if city else (country,)
+        target_dir = _choose_target_dir(base_media, year, rel_parts)
 
         target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -249,6 +287,7 @@ def _handle_storage(
         if is_hash_in_directory(file_hash, target_dir):
             logger.warning(f"Identische Datei bereits im Ziel vorhanden, überspringe: {path.name}")
             register_file(path)
+            _remember_duplicate(path)
             return True
 
         # Final filename
@@ -287,7 +326,7 @@ def _handle_ai_naming(file_info: "Any", file_type: FileType) -> Optional[str]:
         return None
 
     try:
-        from filemind.integrations.ai_naming import generate_smart_name
+        from filemind.integrations.ai_naming import generate_smart_name, truncate_stem
 
         path = file_info.path
         logger.debug(f"Generiere intelligenten Namen: {path.name}")
@@ -323,7 +362,8 @@ def _handle_ai_naming(file_info: "Any", file_type: FileType) -> Optional[str]:
             stem = str(smart_name)
 
         # Sanitize stem: keep lowercase, underscores and alnum
-        stem = re.sub(r"[^a-z0-9_]+", "", stem.lower().replace(" ", "_"))[:30]
+        stem = re.sub(r"[^a-z0-9_]+", "", stem.lower().replace(" ", "_"))
+        stem = truncate_stem(stem)
         if not stem:
             stem = uuid4().hex[:8]
 
@@ -375,6 +415,12 @@ def route_file(path: Path, action: str = "move") -> bool:
             logger.error(f"Datei nicht gefunden: {path}")
             return False
 
+        # 0. Bereits gemeldete Duplikate still überspringen (spart
+        # Klassifizierung, OCR und Hashing in jedem Poll-Durchgang)
+        if _is_known_duplicate(path):
+            logger.debug(f"Bekanntes Duplikat, überspringe: {path.name}")
+            return False
+
         # 1. Klassifizierung
         logger.debug(f"Klassifiziere Datei: {path.name}")
         classification = classify_file(path)
@@ -396,9 +442,8 @@ def route_file(path: Path, action: str = "move") -> bool:
                 # Fallback: call as legacy signature
                 return _handle_storage(fi, ft)
 
-        # 2. Duplikat-Check
+        # 2. Duplikat-Check (Meldung erfolgt einmalig in _handle_deduplication)
         if _handle_deduplication(file_info):
-            logger.warning(f"Datei übersprungen (Duplikat): {path.name}")
             # Datei nicht löschen; sie wurde bereits verarbeitet
             return False
 

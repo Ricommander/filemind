@@ -7,6 +7,10 @@ import yaml
 
 DEFAULT_CONFIG_FILE = Path.cwd() / "config.yaml"
 
+# Zielsprache für generierte Datei- und Ordnernamen (z. B. "Deutschland" vs. "Germany")
+SUPPORTED_LANGUAGES = ("de", "en")
+DEFAULT_LANGUAGE = "en"
+
 _config_file: Path = DEFAULT_CONFIG_FILE
 _config_cache: Optional[Dict[str, Any]] = None
 
@@ -79,3 +83,21 @@ def get_section(section: str, default: Any = None) -> Any:
         default = {}
     config = get_config()
     return config.get(section, default)
+
+
+def get_language() -> str:
+    """Gibt die konfigurierte Zielsprache für generierte Namen zurück.
+
+    Gelesen wird der Top-Level-Schlüssel ``language`` aus der Konfiguration.
+    Unterstützt werden die Werte aus ``SUPPORTED_LANGUAGES``; bei fehlendem
+    oder ungültigem Wert wird ``DEFAULT_LANGUAGE`` verwendet.
+    """
+    language = get_config().get("language", DEFAULT_LANGUAGE)
+    if not isinstance(language, str):
+        return DEFAULT_LANGUAGE
+
+    language = language.strip().lower()
+    if language not in SUPPORTED_LANGUAGES:
+        return DEFAULT_LANGUAGE
+
+    return language

@@ -8,10 +8,11 @@ A modern daemon-based file organization system that automatically classifies, pr
 - 📄 **OCR Support**: Extract text from document images
 - 🔍 **Binary Deduplication**: Detect and prevent duplicate files using SHA-256 hashing
 - 🏷️ **Smart Naming**: AI-powered file naming (first describes the image, then finds the best name based on the description of the image)
-- 📁 **Organized Storage**: Year-based directory structures (YYYY_NN\Country\City format, max 3000 files per folder)
+- 📁 **Organized Storage**: Year-based directory structures (YYYY\Country\City format, max 3000 files directly per folder - subfolders don't count; full folders overflow to YYYY_1, YYYY_2, ...)
 - 🧵 **Thread-Safe**: Concurrent processing with proper locking mechanisms
 - 📊 **Comprehensive Logging**: Rotating file handlers with configurable retention
 - **GPS reverse geocoding**: Finds the correct country and city of an image if GPS coordinates are present in the metadata.
+- 🌍 **Configurable language**: Generated file and folder names in German or English (`language: "de"` or `"en"`, e.g. "Deutschland" vs. "Germany").
 
 ## Architecture
 
@@ -30,7 +31,7 @@ Input Directory
     ├─ Videos/Audio/Archives → Metadata Extraction → Storage
     └─ Others → Storage
     ↓
-[5] Organized Output (YYYY_NN\Country\City folders)
+[5] Organized Output (YYYY\Country\City folders)
 ```
 
 ## Installation
@@ -101,6 +102,11 @@ Edit `config.yaml`:
 # filemind - Intelligent File Organization with AI
 # Configuration File
 
+# Target language for generated file and folder names ("de" or "en")
+# Affects AI naming, fallback name prefixes and reverse-geocoded
+# country/city folders. Example: de -> "Deutschland", en -> "Germany"
+language: "en"
+
 # Logging System
 logging:
   log_dir: ".filemind/logs"           # Directory for log files
@@ -132,7 +138,9 @@ ai:
   provider: "ollama"                   # Currently only "ollama" is supported
   model: "llava:7b"                    # Vision model used to describe images and derive names
   url: "http://localhost:11434"        # Base URL of the local Ollama server
-  timeout: 120                         # Request timeout in seconds (CPU inference can be slow)
+  timeout: 300                         # Request timeout in seconds (CPU inference incl. model load can take minutes)
+  max_image_size: 1024                 # Downscale photos to this size (longest edge, px) before sending to the model (in memory only - the original file is never modified)
+  num_ctx: 8192                        # Context window in tokens. The Ollama server default (4096) is too small for vision models with dynamic resolution - image tokens get truncated and requests fail. Larger values cost more RAM.
 
 # Classification Rules
 classification:
@@ -226,34 +234,31 @@ The system automatically classifies files into these categories:
 Files are organized in the following structure:
 
 ```
-output/
-├── Pictures/
-│   ├── 2026_01/Deutschland/Hodenhagen  (up to 3000 files)
-│   ├── 2026_02/
-│   └── ...
-├── Documents/
-│   ├── 2026_01/
-│   └── ...
-├── Videos/
-│   ├── 2026_01/
-│   └── ...
-├── Audio/
-│   ├── 2026_01/
-│   └── ...
-├── Archives/
-│   ├── 2026_01/
-│   └── ...
-└── Other/
-    └── ...
+base_media_path/
+├── 2026/
+│   ├── Deutschland/
+│   │   └── Hodenhagen/               # Photos with GPS: Country/City
+│   │       └── 2026-06-10_nashorn_grasen_wiese.jpg
+│   └── 2026-06-10_audio_xyz.aac      # Media without location: directly in year folder
+├── 2026_1/                           # Overflow when a target folder exceeds
+│   └── Deutschland/Hodenhagen/       # max_files_per_folder (direct files only)
+└── ...
+
+base_documents_path/                  # Documents are stored flat
+├── scan001.pdf
+└── ...
 ```
+
+The `max_files_per_folder` limit (default 3000) counts only files lying directly
+in the target folder - files in subfolders don't count. When a target folder is
+full, storage overflows to the next year suffix folder (`2026` → `2026_1` → ...).
 
 ## Module Overview
 
 ### Core Modules
 
 - **`classification.classifier`**: File type detection and classification
-- **`routing.router`**: Main routing logic, orchestrates all processing
-- **`storage.structure_manager`**: Directory structure management (YYYY_NN folders)
+- **`routing.router`**: Main routing logic, orchestrates all processing (incl. directory structure)
 - **`storage.hash_store`**: SHA-256 deduplication with SQLite persistence
 
 ### Integration Modules
@@ -319,8 +324,7 @@ filemind/
 ├── routing/
 │   └── router.py                 # Main routing logic
 ├── storage/
-│   ├── hash_store.py             # Deduplication
-│   └── structure_manager.py      # Directory structure
+│   └── hash_store.py             # Deduplication
 └── tests/
     └── test_*.py                 # Unit tests
 ```
@@ -346,7 +350,7 @@ filemind/
 ## Performance Considerations
 
 - **Poll Interval**: Lower = faster detection, higher = less CPU
-- **Max Files per Folder**: 3000 is safe for most systems; adjust based on your needs
+- **Max Files per Folder**: 3000 is safe for most systems; counts only direct files per folder, adjust based on your needs
 - **Logging Level**: Set to WARNING in production to reduce I/O
 - **Hash Store**: Uses SQLite with WAL mode for concurrent access
 

@@ -1,6 +1,9 @@
 # filemind - Intelligent File Organization with AI
 # Configuration File
 
+# Target language for generated file and folder names ("de" or "en")
+language: "de"
+
 # Logging System
 logging:
   log_dir: ".filemind/logs"           # Directory for log files
@@ -27,9 +30,10 @@ storage:
 ai:
   enabled: true
   provider: "ollama"
-  model: "llava:7b"
+  model: "qwen3-vl:2b-instruct"
   url: "http://localhost:11434"
-  timeout: 120
+  timeout: 900
+  num_ctx: 8192
 
 # Classification Rules
 classification:

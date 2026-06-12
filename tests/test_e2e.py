@@ -10,6 +10,8 @@ Netzwerk-Grenze gemockt, damit der Test offline und deterministisch läuft.
 
 from __future__ import annotations
 
+import logging
+import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -133,6 +135,21 @@ def _all_files_recursive(root: Path) -> List[Path]:
     return [p for p in root.rglob("*") if p.is_file()]
 
 
+def _assert_only_valid_location_folders(media_dir: Path) -> None:
+    """Stellt sicher, dass unterhalb des Media-Ordners nur Jahresordner und
+    echte Orts-Namen (Land, Stadt) als Ordner vorkommen - niemals "gps" oder
+    rohe GPS-Koordinaten wie "52.745078_9.616632"."""
+    year_pattern = re.compile(r"^\d{4}(_\d+)?$")
+    coordinate_pattern = re.compile(r"-?\d+\.\d+")
+    for folder in (p for p in media_dir.rglob("*") if p.is_dir()):
+        name = folder.name
+        assert name.lower() != "gps", f"Ungültiger Ordner 'gps' gefunden: {folder}"
+        assert not coordinate_pattern.search(name), f"Ordner mit GPS-Koordinaten gefunden: {folder}"
+        assert year_pattern.match(name) or re.match(
+            r"^[^\d]+$", name
+        ), f"Ordnername ist weder Jahr noch Land/Stadt: {folder}"
+
+
 def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     input_dir = e2e_env["input"]
     media_dir = e2e_env["media"]
@@ -160,6 +177,7 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     image_target = image_targets[0]
     assert image_target.name == f"{today}_dog_playing_park.jpg"
     assert image_target.parent == media_dir / year / "Germany" / "Hodenhagen"
+    _assert_only_valid_location_folders(media_dir)
 
     # Audio: Metadaten-basierter Name direkt im Jahresordner
     audio_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".aac"]
@@ -168,8 +186,44 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     assert audio_target.name.startswith(f"{today}_audio_")
     assert audio_target.parent == media_dir / year
 
+    # Inhalts-Garantie: Die Pipeline benennt nur um/verschiebt - die Dateien
+    # selbst (insb. das Foto trotz AI-Downscaling) bleiben bit-identisch
+    assert image_target.read_bytes() == (REPO_INPUT_DIR / EXPECTED_IMAGE).read_bytes()
+    assert audio_target.read_bytes() == (REPO_INPUT_DIR / EXPECTED_AUDIO).read_bytes()
 
-def test_full_pipeline_detects_duplicates_on_second_run(e2e_env: dict) -> None:
+
+def test_photo_without_geocoding_creates_no_gps_coordinate_folders(
+    e2e_env: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression: Schlägt Reverse-Geocoding fehl (z. B. offline), darf kein
+    Ordner "gps/<Koordinaten>" entstehen - das Foto muss direkt im
+    Jahresordner landen und alle Ordnernamen müssen gültig bleiben."""
+    monkeypatch.setattr(
+        "filemind.integrations.metadata_extractor._reverse_geocode",
+        lambda lat, lon: None,
+    )
+
+    input_dir = e2e_env["input"]
+    media_dir = e2e_env["media"]
+
+    source = REPO_INPUT_DIR / EXPECTED_IMAGE
+    target = input_dir / source.name
+    shutil.copy2(source, target)
+
+    assert route_file(target, action="move") is True
+
+    image_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".jpg"]
+    assert len(image_targets) == 1
+
+    year = datetime.now().strftime("%Y")
+    # Ohne Land/Stadt: direkt im Jahresordner, keine gps-/Koordinaten-Ordner
+    assert image_targets[0].parent == media_dir / year
+    _assert_only_valid_location_folders(media_dir)
+
+
+def test_full_pipeline_detects_duplicates_on_second_run(
+    e2e_env: dict, caplog: pytest.LogCaptureFixture
+) -> None:
     input_dir = e2e_env["input"]
     media_dir = e2e_env["media"]
     docs_dir = e2e_env["docs"]
@@ -192,3 +246,13 @@ def test_full_pipeline_detects_duplicates_on_second_run(e2e_env: dict) -> None:
 
     # Zielstruktur unverändert, keine Duplikate angelegt
     assert second_run_targets == first_run_targets
+
+    # Dritter Durchlauf (weiterer Poll-Zyklus des Daemons): bereits gemeldete
+    # Duplikate werden still übersprungen und nicht erneut geloggt
+    caplog.clear()
+    with caplog.at_level(logging.INFO):
+        for file_path in _copy_test_files(input_dir):
+            assert route_file(file_path, action="move") is False
+
+    repeated_mentions = [r for r in caplog.records if "Duplikat" in r.getMessage()]
+    assert repeated_mentions == []

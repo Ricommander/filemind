@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from filemind.classification.classifier import classify_file
+from filemind.config import get_language
 from filemind.core.models import FileType
 
 logger = logging.getLogger(__name__)
@@ -28,18 +29,25 @@ logger = logging.getLogger(__name__)
 def _reverse_geocode(lat: float, lon: float) -> Optional[Dict[str, str]]:
     """Versucht, Reverse-Geocoding mittels `geopy` durchzuführen.
 
+    Die Sprache der Orts- und Ländernamen richtet sich nach der
+    konfigurierten Zielsprache (``language`` in config.yaml), z. B.
+    "Deutschland" (de) vs. "Germany" (en).
+
     Gibt ein Dict mit Keys `country` und `city` zurück oder `None`,
     falls kein Ergebnis oder `geopy` nicht verfügbar ist.
     """
     try:
         from geopy.geocoders import Nominatim
     except Exception:
-        logger.debug("geopy nicht verfügbar; Reverse-Geocoding übersprungen")
+        logger.warning(
+            "geopy nicht installiert; Reverse-Geocoding übersprungen - "
+            "Medien werden ohne Land/Stadt-Ordner abgelegt"
+        )
         return None
 
     try:
         geolocator = Nominatim(user_agent="filemind")
-        loc = geolocator.reverse((lat, lon), language="en", timeout=10)
+        loc = geolocator.reverse((lat, lon), language=get_language(), timeout=10)
         if not loc:
             return None
         adr = loc.raw.get("address", {})
@@ -68,12 +76,13 @@ def get_country_city_from_file(path: Path) -> Optional[Dict[str, Optional[str]]]
         location = _reverse_geocode(lat, lon)
         if location:
             return location
-        # Fallback: Wenn Reverse-Geocoding nicht möglich ist, verwende GPS-Koordinaten
-        coord_city = f"{lat:.6f}_{lon:.6f}"
+        # Kein Geocoding-Ergebnis: keine Orts-Ordner erzeugen. Ein Fallback auf
+        # rohe GPS-Koordinaten würde Ordner wie "gps/52.745078_9.616632" anlegen.
         logger.debug(
-            f"Reverse-Geocoding nicht verfügbar oder schlug fehl; verwende GPS-Fallback: {coord_city}"
+            f"Reverse-Geocoding lieferte kein Ergebnis für {path}; Datei wird ohne "
+            f"Land/Stadt-Struktur abgelegt"
         )
-        return {"country": "gps", "city": coord_city}
+        return None
     except Exception as e:
         logger.debug(f"Konnte Country/City nicht ermitteln für {path}: {e}")
         return None
