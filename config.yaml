@@ -3,7 +3,7 @@
 
 # Target language for generated file and folder names ("de" or "en")
 # Example: de -> "Deutschland", en -> "Germany"
-language: "en"
+language: "de"
 
 # Logging System
 logging:
@@ -20,7 +20,7 @@ daemon:
       action: "copy"
     - path: "/media/storage_main/altes_backup"
       action: "move"
-  poll_interval: 3600                  # Check for new files every 3600 seconds (1 hour)
+  poll_interval: 300                  # Check for new files every 300 seconds (5 minutes)
 
 # Storage Configuration
 storage:
@@ -34,9 +34,9 @@ storage:
 ai:
   enabled: true                        # Enable AI-powered smart naming for photos
   provider: "ollama"                   # Currently only "ollama" is supported
-  model: "llava:7b"                    # Vision model used to describe images and derive names
+  model: "qwen3-vl:2b-instruct"        # Vision model used to describe images and derive names
   url: "http://localhost:11434"        # Base URL of the local Ollama server
-  timeout: 300                         # Request timeout in seconds (CPU inference incl. model load can take minutes)
+  timeout: 900                         # Request timeout in seconds (CPU inference incl. model load can take minutes)
   max_image_size: 1024                 # Downscale photos to this size (longest edge, px) before sending to the model (in memory only - the original file is never modified)
   num_ctx: 8192                        # Context window in tokens. The Ollama server default (4096) is too small for vision models with dynamic resolution - image tokens get truncated and requests fail. Larger values cost more RAM.
 

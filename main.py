@@ -295,26 +295,45 @@ def run_daemon(foreground: bool = True) -> None:
 
     # Register existing files in target storage to allow duplicate detection
     try:
-        from filemind.storage.hash_store import register_file
+        from filemind.storage.hash_store import is_registered_unchanged, register_file
 
         storage_cfg = get_section("storage", {})
         base_media = Path(storage_cfg.get("base_media_path", ""))
         base_docs = Path(storage_cfg.get("base_documents_path", ""))
 
+        checked_count = 0
+        hashed_count = 0
+
         def _register_all_files_under(root: Path) -> None:
+            nonlocal checked_count, hashed_count
             if not root or not root.exists():
                 return
             for dirpath, _, filenames in os.walk(root):
                 for fname in filenames:
+                    p = Path(dirpath) / fname
+                    checked_count += 1
                     try:
-                        p = Path(dirpath) / fname
-                        register_file(p)
+                        # Bereits registrierte, unveränderte Dateien nicht erneut
+                        # hashen - das macht den Start nach dem ersten Durchlauf
+                        # um Größenordnungen schneller
+                        if not is_registered_unchanged(p):
+                            register_file(p)
+                            hashed_count += 1
                     except Exception:
                         continue
+                    finally:
+                        if checked_count % 1000 == 0:
+                            logger.info(
+                                f"Duplikatprüfung läuft: {checked_count} Ziel-Dateien "
+                                f"geprüft ({hashed_count} neu gehasht)"
+                            )
 
         _register_all_files_under(base_media)
         _register_all_files_under(base_docs)
-        logger.info("Vorhandene Ziel-Dateien registriert für Duplikatprüfung")
+        logger.info(
+            f"Vorhandene Ziel-Dateien registriert für Duplikatprüfung "
+            f"({checked_count} geprüft, {hashed_count} neu gehasht)"
+        )
     except Exception as e:
         logger.warning(f"Konnte vorhandene Ziel-Dateien nicht registrieren: {e}")
 

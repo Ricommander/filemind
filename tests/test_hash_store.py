@@ -38,6 +38,28 @@ def test_register_and_detect_duplicate(tmp_path: Path) -> None:
     store.close()
 
 
+def test_is_registered_unchanged(tmp_path: Path) -> None:
+    file_path = tmp_path / "media.jpg"
+    file_path.write_bytes(b"original content")
+    db_path = tmp_path / "hash_store.db"
+
+    store = HashStore(db_path=db_path)
+
+    # Nicht registrierte Datei
+    assert store.is_registered_unchanged(file_path) is False
+
+    store.register_file(file_path)
+    assert store.is_registered_unchanged(file_path) is True
+
+    # Größenänderung wird erkannt
+    file_path.write_bytes(b"different, longer content")
+    assert store.is_registered_unchanged(file_path) is False
+
+    # Nicht existierende Datei
+    assert store.is_registered_unchanged(tmp_path / "missing.jpg") is False
+    store.close()
+
+
 def test_delete_hash_removes_entry(tmp_path: Path) -> None:
     content = b"to delete"
     file_path = tmp_path / "delete.txt"

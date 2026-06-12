@@ -7,6 +7,8 @@ Funktionalität:
 - compute_sha256(path: Path) -> str: Berechnet SHA-256 Hash einer Datei.
 - is_duplicate(path: Path) -> bool: Prüft, ob eine Datei bereits existiert.
 - register_file(path: Path) -> None: Registriert eine Datei im Hash-Index.
+- is_registered_unchanged(path: Path) -> bool: Prüft ohne Hashing, ob eine Datei
+  bereits mit unveränderter Größe registriert ist.
 - Robustheit gegen Abstürze durch SQLite-Transaktionen.
 - Umfassendes Logging.
 """
@@ -283,6 +285,42 @@ class HashStore:
             logger.error(error_msg)
             raise RuntimeError(error_msg) from e
 
+    def is_registered_unchanged(self, path: Path) -> bool:
+        """Prüft ohne Hashing, ob eine Datei bereits unverändert registriert ist.
+
+        Vergleicht nur Pfad und Dateigröße gegen den Index. Das ist um
+        Größenordnungen schneller als ``register_file`` (kein Lesen des
+        Dateiinhalts) und erlaubt es, beim Daemon-Start die erneute
+        Hash-Berechnung für bereits bekannte Ziel-Dateien zu überspringen.
+
+        Einschränkung: Eine inhaltlich geänderte Datei mit identischer Größe
+        wird nicht erkannt. Für den von filemind selbst verwalteten
+        Zielbestand ist das akzeptabel.
+
+        Args:
+                path: Dateipfad.
+
+        Returns:
+                True, falls der Pfad mit unveränderter Größe registriert ist.
+        """
+        try:
+            file_size = path.stat().st_size
+
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT file_size FROM file_hashes WHERE file_path = ?",
+                (str(path),),
+            )
+
+            result = cursor.fetchone()
+            return result is not None and result[0] == file_size
+
+        except Exception as e:
+            logger.debug(f"Fehler bei is_registered_unchanged für {path}: {e}")
+            return False
+
     def get_hash_by_path(self, path: Path) -> Optional[str]:
         """Ruft den Hash einer registrierten Datei ab.
 
@@ -533,6 +571,20 @@ def register_file(path: Path) -> None:
             path: Dateipfad.
     """
     get_hash_store().register_file(path)
+
+
+def is_registered_unchanged(path: Path) -> bool:
+    """Prüft ohne Hashing, ob eine Datei bereits unverändert registriert ist.
+
+    Convenience-Funktion, die die globale HashStore-Instanz nutzt.
+
+    Args:
+            path: Dateipfad.
+
+    Returns:
+            True, falls der Pfad mit unveränderter Größe registriert ist.
+    """
+    return get_hash_store().is_registered_unchanged(path)
 
 
 def find_paths_by_hash(file_hash: str) -> List[str]:
