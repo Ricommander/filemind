@@ -130,6 +130,12 @@ def test_text_heavy_low_color_is_document(
     img = tmp_path / "brief.jpg"
     img.write_bytes(b"dummy")
 
+    # Schwellen explizit pinnen, damit der Test nicht von der jeweils geladenen
+    # config.yaml abhängt (_TEXT_HEAVY hat 14 Wörter).
+    monkeypatch.setattr(
+        "filemind.classification.classifier._get_document_image_thresholds",
+        lambda: (8, 18.0),
+    )
     monkeypatch.setattr(
         "filemind.classification.classifier._extract_text_from_image",
         lambda path: _TEXT_HEAVY,
@@ -152,6 +158,12 @@ def test_text_heavy_but_colorful_is_real_image(
     img = tmp_path / "einladung.jpg"
     img.write_bytes(b"dummy")
 
+    # Schwellen explizit pinnen, damit "viel Text" unabhängig von der geladenen
+    # config.yaml über der Wortgrenze liegt und allein die Farbe entscheidet.
+    monkeypatch.setattr(
+        "filemind.classification.classifier._get_document_image_thresholds",
+        lambda: (8, 18.0),
+    )
     monkeypatch.setattr(
         "filemind.classification.classifier._extract_text_from_image",
         lambda path: _TEXT_HEAVY,

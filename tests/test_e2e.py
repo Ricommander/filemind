@@ -29,6 +29,11 @@ EXPECTED_DOCUMENTS = {"23948OIKSJD.txt", "29084904SDSAD.odt", "29084904SDSAD.pdf
 EXPECTED_IMAGE = "20260527_114047.jpg"
 EXPECTED_AUDIO = "aud20200326wa0011.aac"
 
+# Das Foto trägt im EXIF-Block DateTimeOriginal = 2026:05:27. Der Dateiname muss
+# dieses Erstelldatum des Bildes verwenden - nicht das (Kopier-)Datum im Dateisystem.
+EXPECTED_IMAGE_DATE = "2026-05-27"
+EXPECTED_IMAGE_YEAR = EXPECTED_IMAGE_DATE.split("-")[0]
+
 
 @pytest.fixture(autouse=True)
 def _no_ocr(monkeypatch: pytest.MonkeyPatch):
@@ -169,22 +174,24 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     assert doc_names == EXPECTED_DOCUMENTS
 
     today = datetime.now().date().isoformat()
-    year = today.split("-")[0]
+    audio_year = today.split("-")[0]
 
-    # Foto: AI-Name + GPS-basierte Country/City-Struktur
+    # Foto: AI-Name + GPS-basierte Country/City-Struktur. Das Datum stammt aus
+    # dem EXIF-Aufnahmedatum (Erstelldatum des Bildes), nicht aus dem Dateisystem.
     image_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".jpg"]
     assert len(image_targets) == 1
     image_target = image_targets[0]
-    assert image_target.name == f"{today}_dog_playing_park.jpg"
-    assert image_target.parent == media_dir / year / "Germany" / "Hodenhagen"
+    assert image_target.name == f"{EXPECTED_IMAGE_DATE}_dog_playing_park.jpg"
+    assert image_target.parent == media_dir / EXPECTED_IMAGE_YEAR / "Germany" / "Hodenhagen"
     _assert_only_valid_location_folders(media_dir)
 
-    # Audio: Metadaten-basierter Name direkt im Jahresordner
+    # Audio: Metadaten-basierter Name direkt im Jahresordner. Ohne EXIF greift
+    # für das Datum der Datei-Zeitstempel (hier das Kopierdatum = heute).
     audio_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".aac"]
     assert len(audio_targets) == 1
     audio_target = audio_targets[0]
     assert audio_target.name.startswith(f"{today}_audio_")
-    assert audio_target.parent == media_dir / year
+    assert audio_target.parent == media_dir / audio_year
 
     # Inhalts-Garantie: Die Pipeline benennt nur um/verschiebt - die Dateien
     # selbst (insb. das Foto trotz AI-Downscaling) bleiben bit-identisch
@@ -215,9 +222,9 @@ def test_photo_without_geocoding_creates_no_gps_coordinate_folders(
     image_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".jpg"]
     assert len(image_targets) == 1
 
-    year = datetime.now().strftime("%Y")
-    # Ohne Land/Stadt: direkt im Jahresordner, keine gps-/Koordinaten-Ordner
-    assert image_targets[0].parent == media_dir / year
+    # Ohne Land/Stadt: direkt im Jahresordner (Jahr aus dem EXIF-Aufnahmedatum),
+    # keine gps-/Koordinaten-Ordner
+    assert image_targets[0].parent == media_dir / EXPECTED_IMAGE_YEAR
     _assert_only_valid_location_folders(media_dir)
 
 

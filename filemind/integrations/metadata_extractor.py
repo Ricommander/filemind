@@ -146,8 +146,16 @@ def extract_metadata_name(path: Path) -> str:
             if gps:
                 lat = gps.get("lat")
                 lon = gps.get("lon")
-                # Erzeuge einen aussagekräftigen Namen mit Geo-Kürzel
-                timestamp = _get_file_timestamp(path)
+                # Erzeuge einen aussagekräftigen Namen mit Geo-Kürzel.
+                # Auch hier zählt das EXIF-Aufnahmedatum als Erstelldatum des
+                # Bildes; nur wenn keines vorliegt, dient der Datei-Zeitstempel
+                # als Rückfallebene.
+                capture = _extract_image_capture_datetime(path)
+                timestamp = (
+                    capture.strftime("%Y%m%d_%H%M%S")
+                    if capture is not None
+                    else _get_file_timestamp(path)
+                )
                 name = f"photo_{lat:.6f}_{lon:.6f}_{timestamp}"
             else:
                 name = _extract_generic_metadata_name(path)
@@ -184,10 +192,59 @@ def _get_file_timestamp(path: Path) -> str:
         return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+def _extract_image_capture_datetime(path: Path) -> Optional[datetime]:
+    """Liest das Aufnahmedatum (Erstelldatum) eines Bildes aus dessen EXIF-Daten.
+
+    Das EXIF-Feld ``DateTimeOriginal`` enthält den Zeitpunkt, zu dem das Bild
+    tatsächlich aufgenommen wurde - also das echte Erstelldatum des Bildes.
+    Reihenfolge der Bevorzugung: ``DateTimeOriginal`` (Aufnahme) ->
+    ``DateTimeDigitized`` (Digitalisierung) -> ``DateTime`` (letzte Änderung).
+
+    Gibt ``None`` zurück, wenn keine verwertbaren EXIF-Daten vorliegen, die Datei
+    kein lesbares Bild ist oder Pillow nicht installiert ist.
+    """
+    try:
+        from PIL import Image
+        from PIL.ExifTags import TAGS
+    except Exception:
+        logger.debug("Pillow nicht verfügbar; EXIF-Datum-Extraktion übersprungen")
+        return None
+
+    try:
+        with Image.open(path) as img:
+            exif = img._getexif()
+        if not exif:
+            return None
+
+        tag_values = {TAGS.get(tag, tag): value for tag, value in exif.items()}
+        for key in ("DateTimeOriginal", "DateTimeDigitized", "DateTime"):
+            raw = tag_values.get(key)
+            if not raw:
+                continue
+            raw = str(raw).strip()
+            # EXIF speichert Zeitstempel als "YYYY:MM:DD HH:MM:SS".
+            for fmt in ("%Y:%m:%d %H:%M:%S", "%Y:%m:%d"):
+                try:
+                    return datetime.strptime(raw, fmt)
+                except ValueError:
+                    continue
+            logger.debug(f"Unerwartetes EXIF-Datumsformat {raw!r} in {path}")
+        return None
+    except Exception as e:
+        logger.debug(f"Konnte EXIF-Aufnahmedatum nicht lesen für {path}: {e}")
+        return None
+
+
 def get_file_creation_date(path: Path) -> str:
     """Gibt das Erstellungsdatum der Datei im Format YYYY-MM-DD zurück.
 
-    Verwendet `st_ctime` wenn verfügbar, sonst fällt auf das aktuelle Datum zurück.
+    Bei Bildern wird zuerst das EXIF-Aufnahmedatum (``DateTimeOriginal``)
+    verwendet, da dies dem tatsächlichen Erstelldatum des Bildes entspricht.
+    Der Datei-Zeitstempel (`st_ctime`) ist dafür ungeeignet, weil er beim
+    Kopieren oder Download auf den aktuellen Zeitpunkt gesetzt wird. Nur wenn
+    kein EXIF-Aufnahmedatum vorliegt, wird auf `st_ctime` und schließlich auf
+    das aktuelle Datum zurückgegriffen.
+
     Diese Funktion ist öffentlich, damit andere Module (z. B. Router)
     konsistent das Datum aus den Metadaten beziehen können.
 
@@ -197,6 +254,10 @@ def get_file_creation_date(path: Path) -> str:
     Returns:
             Datum als ISO-String `YYYY-MM-DD`.
     """
+    capture = _extract_image_capture_datetime(path)
+    if capture is not None:
+        return capture.date().isoformat()
+
     try:
         ctime = path.stat().st_ctime
         return datetime.fromtimestamp(ctime).date().isoformat()
