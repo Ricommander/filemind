@@ -151,7 +151,7 @@ def _handle_storage(
     # - Bilder -> `storage.base_media_path\YYYY\<Country>\<City>\YYYY-MM-DD_name.ext`
     # - Andere Dateien ähnlich wie Bilder, Name aber nur aus Metadaten
     try:
-        from filemind.integrations.ai_naming import generate_smart_name, truncate_stem
+        from filemind.integrations.ai_naming import generate_smart_name, to_pascal_case
         from filemind.integrations.metadata_extractor import (
             get_country_city_from_file,
             get_file_creation_date,
@@ -269,9 +269,11 @@ def _handle_storage(
         if not stem:
             stem = path.stem
 
-        # sanitize stem
-        stem = str(stem)
-        stem = truncate_stem(re.sub(r"[^a-z0-9_\-]+", "_", stem.lower()).strip("_"))
+        # Stamm in PascalCase (mit Unterstrichen als Trenner) überführen. Dies ist
+        # der einzige maßgebliche Punkt für die Schreibweise des finalen
+        # Dateinamens: Sowohl KI- als auch Metadaten-Namen laufen hier durch
+        # (Wörter großgeschrieben), z. B. "dog_playing_park" -> "Dog_Playing_Park".
+        stem = to_pascal_case(str(stem))
         ext = path.suffix.lower()
 
         # Build target dir: year (+ country/city), Kapazität gilt für den Zielordner

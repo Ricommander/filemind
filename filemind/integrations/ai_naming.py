@@ -320,6 +320,36 @@ def truncate_stem(stem: str, limit: int = MAX_STEM_LENGTH) -> str:
     return cut.rstrip("_")
 
 
+def to_pascal_case(text: str, limit: int = MAX_STEM_LENGTH) -> str:
+    """Wandelt einen Dateinamens-Stamm in PascalCase mit Unterstrichen um.
+
+    Wörter werden an Trennzeichen (Unterstrich, Bindestrich, Leerzeichen) sowie
+    sonstigen Nicht-Alphanumerischen Zeichen erkannt, jeweils mit großem
+    Anfangsbuchstaben versehen und durch Unterstriche getrennt::
+
+        "dog_playing_park" -> "Dog_Playing_Park"
+
+    Das Ergebnis wird an einer Wortgrenze auf ``limit`` Zeichen begrenzt; ein
+    einzelnes überlanges Wort wird hart geschnitten. Die Funktion ist idempotent:
+    Bereits so formatierte Eingaben bleiben unverändert.
+    """
+    words = [word[:1].upper() + word[1:] for word in re.findall(r"[A-Za-z0-9]+", text or "")]
+
+    result = ""
+    for word in words:
+        if not result:
+            # Erstes Wort: notfalls hart auf das Limit schneiden, falls es allein
+            # schon zu lang ist.
+            result = word[:limit]
+            continue
+        # +1 für den verbindenden Unterstrich.
+        if len(result) + 1 + len(word) > limit:
+            break
+        result = f"{result}_{word}"
+
+    return result
+
+
 def _clean_to_stem(text: str) -> str:
     """Bereinigt einen Text zu einem Dateinamens-Stamm.
 

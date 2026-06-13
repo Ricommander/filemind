@@ -170,7 +170,8 @@ def test_handle_storage_ignores_subfolder_files_for_year_capacity(
     assert result is True
     # Jahresordner hat 0 direkte Dateien -> kein Überlauf nach 2026_1
     assert not (base_media / "2026_1").exists()
-    assert (base_media / "2026" / "2026-05-01_sample.mp3").exists()
+    # Der Stamm wird in PascalCase geschrieben ("sample" -> "Sample")
+    assert (base_media / "2026" / "2026-05-01_Sample.mp3").exists()
 
 
 def test_handle_storage_full_city_folder_rolls_over_to_next_year_folder(
@@ -222,7 +223,8 @@ def test_handle_storage_full_city_folder_rolls_over_to_next_year_folder(
     )
 
     assert result is True
-    target = base_media / "2026_1" / "Deutschland" / "Hodenhagen" / "2026-05-01_nashorn_wiese.jpg"
+    # Der Stamm wird in PascalCase geschrieben ("nashorn_wiese" -> "Nashorn_Wiese")
+    target = base_media / "2026_1" / "Deutschland" / "Hodenhagen" / "2026-05-01_Nashorn_Wiese.jpg"
     assert target.exists()
     # Der volle Stadt-Ordner wurde nicht weiter befüllt
     assert [p.name for p in city_dir.iterdir()] == ["existing.jpg"]

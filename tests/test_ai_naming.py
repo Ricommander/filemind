@@ -91,6 +91,39 @@ def test_truncate_stem_cuts_at_word_boundary() -> None:
     assert ai_naming.truncate_stem("x" * 200) == "x" * ai_naming.MAX_STEM_LENGTH
 
 
+def test_to_pascal_case_converts_words() -> None:
+    # Wörter werden großgeschrieben, die Unterstriche als Trenner bleiben erhalten
+    assert ai_naming.to_pascal_case("dog_playing_park") == "Dog_Playing_Park"
+    assert ai_naming.to_pascal_case("sunset_over_the_ocean") == "Sunset_Over_The_Ocean"
+    # Bindestriche, Leerzeichen und Mehrfach-Trenner werden zu Unterstrichen normalisiert
+    assert ai_naming.to_pascal_case("nashorn-auf  wiese") == "Nashorn_Auf_Wiese"
+    # Ziffern bleiben erhalten und bilden eigene Segmente
+    assert ai_naming.to_pascal_case("photo_2024_holiday") == "Photo_2024_Holiday"
+
+
+def test_to_pascal_case_empty_returns_empty() -> None:
+    assert ai_naming.to_pascal_case("") == ""
+    assert ai_naming.to_pascal_case("___") == ""
+
+
+def test_to_pascal_case_is_idempotent() -> None:
+    once = ai_naming.to_pascal_case("dog_playing_park")
+    assert ai_naming.to_pascal_case(once) == once == "Dog_Playing_Park"
+
+
+def test_to_pascal_case_truncates_at_word_boundary() -> None:
+    # 20 gleiche Wörter à 5 Zeichen mit Unterstrichen: nach 10 Wörtern (59 Zeichen)
+    # würde das nächste Wort das Limit (60) sprengen -> Schnitt an der Wortgrenze.
+    result = ai_naming.to_pascal_case("_".join(["lange"] * 20))
+    assert len(result) <= ai_naming.MAX_STEM_LENGTH
+    assert result == "_".join(["Lange"] * 10)
+
+    # Einzelnes überlanges Wort ohne Wortgrenze: harter Schnitt am Limit
+    hard_cut = ai_naming.to_pascal_case("x" * 200)
+    assert len(hard_cut) == ai_naming.MAX_STEM_LENGTH
+    assert hard_cut == "X" + "x" * (ai_naming.MAX_STEM_LENGTH - 1)
+
+
 def test_generate_endpoint_normalizes_url() -> None:
     assert (
         ai_naming._generate_endpoint("http://localhost:11434")

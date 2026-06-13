@@ -181,16 +181,18 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     image_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".jpg"]
     assert len(image_targets) == 1
     image_target = image_targets[0]
-    assert image_target.name == f"{EXPECTED_IMAGE_DATE}_dog_playing_park.jpg"
+    # Der Stamm wird in PascalCase geschrieben ("dog_playing_park" -> "Dog_Playing_Park")
+    assert image_target.name == f"{EXPECTED_IMAGE_DATE}_Dog_Playing_Park.jpg"
     assert image_target.parent == media_dir / EXPECTED_IMAGE_YEAR / "Germany" / "Hodenhagen"
     _assert_only_valid_location_folders(media_dir)
 
     # Audio: Metadaten-basierter Name direkt im Jahresordner. Ohne EXIF greift
-    # für das Datum der Datei-Zeitstempel (hier das Kopierdatum = heute).
+    # für das Datum der Datei-Zeitstempel (hier das Kopierdatum = heute). Auch
+    # der Metadaten-Stamm ist PascalCase ("audio_..." -> "Audio...").
     audio_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".aac"]
     assert len(audio_targets) == 1
     audio_target = audio_targets[0]
-    assert audio_target.name.startswith(f"{today}_audio_")
+    assert audio_target.name.startswith(f"{today}_Audio")
     assert audio_target.parent == media_dir / audio_year
 
     # Inhalts-Garantie: Die Pipeline benennt nur um/verschiebt - die Dateien
