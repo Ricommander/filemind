@@ -42,6 +42,14 @@ ai:
 
 # Classification Rules
 classification:
+  # Document-image detection (distinguishing scanned/photographed documents from
+  # real photos). A picture is only treated as a document when OCR finds a lot of
+  # text AND the image has little color. Colorful pictures with text (e.g. birthday
+  # invitation cards) stay real photos.
+  document_image_min_words: 15          # Minimum number of OCR words to even consider a document
+  document_image_max_colorfulness: 13.0  # Max color value (Hasler/Süsstrunk) for a document; above = treated as photo.
+                                         # Rough guide: <15 low color, ~33 moderate, >45 strongly colored. Lower = stricter (fewer documents).
+
   # Image extensions (REAL_IMAGE)
   image_extensions:
     - ".jpg"

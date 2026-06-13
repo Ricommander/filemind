@@ -119,3 +119,66 @@ def test_detect_text_in_image_stub_behaviour(tmp_path: Path) -> None:
 
     assert score >= 20.0
     assert score <= 100.0
+
+
+_TEXT_HEAVY = "Dies ist ein langer Brief mit sehr viel Text und vielen einzelnen Woertern darin"
+
+
+def test_text_heavy_low_color_is_document(
+    monkeypatch: "pytest.MonkeyPatch", tmp_path: Path
+) -> None:
+    img = tmp_path / "brief.jpg"
+    img.write_bytes(b"dummy")
+
+    monkeypatch.setattr(
+        "filemind.classification.classifier._extract_text_from_image",
+        lambda path: _TEXT_HEAVY,
+    )
+    # Graustufen-artig -> niedriger Farbwert
+    monkeypatch.setattr(
+        "filemind.classification.classifier._compute_colorfulness",
+        lambda path: 3.0,
+    )
+
+    result = classify_file(img)
+
+    assert result.file_type == FileType.DOCUMENT_IMAGE
+    assert result.confidence == pytest.approx(0.75)
+
+
+def test_text_heavy_but_colorful_is_real_image(
+    monkeypatch: "pytest.MonkeyPatch", tmp_path: Path
+) -> None:
+    img = tmp_path / "einladung.jpg"
+    img.write_bytes(b"dummy")
+
+    monkeypatch.setattr(
+        "filemind.classification.classifier._extract_text_from_image",
+        lambda path: _TEXT_HEAVY,
+    )
+    # Bunte Einladungskarte -> hoher Farbwert
+    monkeypatch.setattr(
+        "filemind.classification.classifier._compute_colorfulness",
+        lambda path: 55.0,
+    )
+
+    result = classify_file(img)
+
+    assert result.file_type == FileType.REAL_IMAGE
+    assert result.confidence == pytest.approx(0.9)
+
+
+def test_few_words_image_is_real_image(monkeypatch: "pytest.MonkeyPatch", tmp_path: Path) -> None:
+    img = tmp_path / "strassenschild.jpg"
+    img.write_bytes(b"dummy")
+
+    # Nur wenige Wörter (z. B. ein Schild im Foto) -> kein Dokument
+    monkeypatch.setattr(
+        "filemind.classification.classifier._extract_text_from_image",
+        lambda path: "Hauptstrasse 12",
+    )
+
+    result = classify_file(img)
+
+    assert result.file_type == FileType.REAL_IMAGE
+    assert result.confidence == pytest.approx(0.9)
