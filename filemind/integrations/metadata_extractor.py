@@ -192,15 +192,41 @@ def _get_file_timestamp(path: Path) -> str:
         return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+# Untergrenze für plausible Aufnahmedaten: Digitalfotos entstehen frühestens in den
+# 1990ern; ältere Werte (häufig 1970 = Unix-Epoch) sind ungültige Platzhalter.
+_MIN_PLAUSIBLE_CAPTURE_YEAR = 1990
+
+
+def _is_plausible_capture_datetime(value: datetime) -> bool:
+    """Prüft, ob ein EXIF-Aufnahmedatum plausibel (gültig) ist.
+
+    Ungültig sind Daten vor ``_MIN_PLAUSIBLE_CAPTURE_YEAR`` (typische
+    Platzhalter wie 1970) sowie Daten in der Zukunft (fehlerhafte Kamera-Uhr).
+    """
+    if value.year < _MIN_PLAUSIBLE_CAPTURE_YEAR:
+        return False
+    if value.date() > datetime.now().date():
+        return False
+    return True
+
+
 def _extract_image_capture_datetime(path: Path) -> Optional[datetime]:
-    """Liest das Aufnahmedatum (Erstelldatum) eines Bildes aus dessen EXIF-Daten.
+    """Liest das Aufnahmedatum eines Bildes aus dessen EXIF-Daten.
 
-    Das EXIF-Feld ``DateTimeOriginal`` enthält den Zeitpunkt, zu dem das Bild
-    tatsächlich aufgenommen wurde - also das echte Erstelldatum des Bildes.
-    Reihenfolge der Bevorzugung: ``DateTimeOriginal`` (Aufnahme) ->
-    ``DateTimeDigitized`` (Digitalisierung) -> ``DateTime`` (letzte Änderung).
+    Maßgeblich ist **ausschließlich** ``DateTimeOriginal`` - der Zeitpunkt, zu dem
+    das Bild tatsächlich aufgenommen wurde. Die EXIF-Felder ``DateTime`` (Zeitpunkt
+    der letzten Bearbeitung durch Software) und ``DateTimeDigitized``
+    (Digitalisierung) werden bewusst NICHT als Aufnahmedatum gewertet: Bei
+    weitergereichten oder bearbeiteten Bildern (Messenger, Re-Export, Bildeditor)
+    setzt Software diese Felder auf den Verarbeitungszeitpunkt. Dieser kann später
+    liegen als die echten Datei-Zeitstempel und würde dann - da das Aufnahmedatum
+    Vorrang hat - ein irreführendes Datum im Dateinamen erzeugen.
 
-    Gibt ``None`` zurück, wenn keine verwertbaren EXIF-Daten vorliegen, die Datei
+    Das gefundene Datum wird zusätzlich auf Plausibilität geprüft
+    (siehe ``_is_plausible_capture_datetime``); unplausible Werte gelten als
+    ungültig und führen zu ``None``.
+
+    Gibt ``None`` zurück, wenn kein gültiges Aufnahmedatum vorliegt, die Datei
     kein lesbares Bild ist oder Pillow nicht installiert ist.
     """
     try:
@@ -217,19 +243,29 @@ def _extract_image_capture_datetime(path: Path) -> Optional[datetime]:
             return None
 
         tag_values = {TAGS.get(tag, tag): value for tag, value in exif.items()}
-        for key in ("DateTimeOriginal", "DateTimeDigitized", "DateTime"):
-            raw = tag_values.get(key)
-            if not raw:
+        raw = tag_values.get("DateTimeOriginal")
+        if not raw:
+            return None
+
+        raw = str(raw).strip()
+        # EXIF speichert Zeitstempel als "YYYY:MM:DD HH:MM:SS".
+        captured: Optional[datetime] = None
+        for fmt in ("%Y:%m:%d %H:%M:%S", "%Y:%m:%d"):
+            try:
+                captured = datetime.strptime(raw, fmt)
+                break
+            except ValueError:
                 continue
-            raw = str(raw).strip()
-            # EXIF speichert Zeitstempel als "YYYY:MM:DD HH:MM:SS".
-            for fmt in ("%Y:%m:%d %H:%M:%S", "%Y:%m:%d"):
-                try:
-                    return datetime.strptime(raw, fmt)
-                except ValueError:
-                    continue
+
+        if captured is None:
             logger.debug(f"Unerwartetes EXIF-Datumsformat {raw!r} in {path}")
-        return None
+            return None
+
+        if not _is_plausible_capture_datetime(captured):
+            logger.debug(f"Unplausibles EXIF-Aufnahmedatum {captured.isoformat()} in {path}")
+            return None
+
+        return captured
     except Exception as e:
         logger.debug(f"Konnte EXIF-Aufnahmedatum nicht lesen für {path}: {e}")
         return None

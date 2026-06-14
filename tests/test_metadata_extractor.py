@@ -56,6 +56,133 @@ def test_extract_image_capture_datetime_none_for_non_image(tmp_path):
     assert _extract_image_capture_datetime(p) is None
 
 
+# EXIF-Tag-IDs für die feldgenaue Prüfung der Aufnahmedatum-Erkennung.
+_TAG_DATETIME = 306  # 0x0132 - letzte Bearbeitung durch Software (KEIN Aufnahmedatum)
+_TAG_DATETIME_ORIGINAL = 36867  # 0x9003 - Aufnahmedatum
+_TAG_DATETIME_DIGITIZED = 36868  # 0x9004 - Digitalisierung
+
+
+class _FakeExifImage:
+    """Minimaler Image-Ersatz mit kontrollierten EXIF-Tags (Tag-ID -> Wert)."""
+
+    def __init__(self, exif: dict):
+        self._exif = exif
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def _getexif(self):
+        return self._exif
+
+
+def test_capture_date_uses_datetimeoriginal(monkeypatch, tmp_path):
+    """Das EXIF-Feld ``DateTimeOriginal`` liefert das Aufnahmedatum."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "foto.jpg"
+    p.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage({_TAG_DATETIME_ORIGINAL: "2024:05:27 10:00:00"}),
+    )
+
+    captured = _extract_image_capture_datetime(p)
+    assert captured is not None
+    assert captured.date().isoformat() == "2024-05-27"
+
+
+def test_capture_date_ignores_exif_datetime_field(monkeypatch, tmp_path):
+    """Regression (gemeldeter Fall): Das EXIF-Feld ``DateTime`` ist der
+    Bearbeitungszeitpunkt, KEIN Aufnahmedatum. Es darf nicht als solches gewertet
+    werden - sonst kann ein bei der Bildbearbeitung gesetztes, späteres Datum den
+    Dateinamen verfälschen."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "verarbeitet.jpg"
+    p.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage({_TAG_DATETIME: "2026:06:06 12:00:00"}),
+    )
+
+    assert _extract_image_capture_datetime(p) is None
+
+
+def test_capture_date_ignores_datetimedigitized(monkeypatch, tmp_path):
+    """Auch ``DateTimeDigitized`` (Digitalisierung) zählt nicht als Aufnahmedatum;
+    maßgeblich ist allein ``DateTimeOriginal``."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "scan.jpg"
+    p.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage({_TAG_DATETIME_DIGITIZED: "2024:05:27 10:00:00"}),
+    )
+
+    assert _extract_image_capture_datetime(p) is None
+
+
+def test_capture_date_rejects_future_date(monkeypatch, tmp_path):
+    """Ein in der Zukunft liegendes Aufnahmedatum (fehlerhafte Kamera-Uhr) ist
+    ungültig und wird verworfen."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "zukunft.jpg"
+    p.write_bytes(b"fake")
+
+    future = datetime.datetime.now() + datetime.timedelta(days=365)
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage(
+            {_TAG_DATETIME_ORIGINAL: future.strftime("%Y:%m:%d %H:%M:%S")}
+        ),
+    )
+
+    assert _extract_image_capture_datetime(p) is None
+
+
+def test_capture_date_rejects_prehistoric_date(monkeypatch, tmp_path):
+    """Ein absurd altes Aufnahmedatum (z. B. 1970-Platzhalter) ist ungültig."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "epoch.jpg"
+    p.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage({_TAG_DATETIME_ORIGINAL: "1970:01:01 00:00:00"}),
+    )
+
+    assert _extract_image_capture_datetime(p) is None
+
+
+def test_get_file_creation_date_exif_datetime_does_not_override_older_file_dates(
+    monkeypatch, tmp_path
+):
+    """Reproduziert den gemeldeten Fall: EXIF enthält nur ``DateTime`` (Bearbeitung)
+    mit 2026-06-06, die Datei-Zeitstempel zeigen aber auf den älteren 2026-04-09.
+    Der Bearbeitungsstempel darf das Datum NICHT auf 06-06 setzen; es muss das
+    ältere, plausible Datei-Datum 04-09 verwendet werden."""
+    pytest.importorskip("PIL")
+    p = tmp_path / "weitergereicht.jpg"
+    p.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "PIL.Image.open",
+        lambda *a, **k: _FakeExifImage({_TAG_DATETIME: "2026:06:06 12:00:00"}),
+    )
+
+    file_ts = datetime.datetime(2026, 4, 9, 8, 0, 0).timestamp()
+    monkeypatch.setattr(
+        "pathlib.Path.stat",
+        lambda self: SimpleNamespace(st_mtime=file_ts, st_ctime=file_ts),
+    )
+
+    assert get_file_creation_date(p) == "2026-04-09"
+
+
 def test_get_file_creation_date_from_stat(monkeypatch, tmp_path):
     """Ohne EXIF (Datei ist kein Bild) und ohne ``st_mtime`` im Mock bleiben nur
     das Erstelldatum (``st_ctime``, 2021) und das aktuelle Datum gültig - das
