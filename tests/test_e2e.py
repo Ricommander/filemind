@@ -29,8 +29,8 @@ EXPECTED_DOCUMENTS = {"23948OIKSJD.txt", "29084904SDSAD.odt", "29084904SDSAD.pdf
 EXPECTED_IMAGE = "20260527_114047.jpg"
 EXPECTED_AUDIO = "aud20200326wa0011.aac"
 
-# Das Foto trägt im EXIF-Block DateTimeOriginal = 2026:05:27. Der Dateiname muss
-# dieses Erstelldatum des Bildes verwenden - nicht das (Kopier-)Datum im Dateisystem.
+# Das Foto trägt im EXIF-Block DateTimeOriginal = 2026:05:27. Das Aufnahmedatum hat
+# Vorrang vor allen Datei-Zeitstempeln und muss daher im Dateinamen verwendet werden.
 EXPECTED_IMAGE_DATE = "2026-05-27"
 EXPECTED_IMAGE_YEAR = EXPECTED_IMAGE_DATE.split("-")[0]
 
@@ -173,11 +173,8 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     doc_names = {p.name for p in _all_files_recursive(docs_dir)}
     assert doc_names == EXPECTED_DOCUMENTS
 
-    today = datetime.now().date().isoformat()
-    audio_year = today.split("-")[0]
-
-    # Foto: AI-Name + GPS-basierte Country/City-Struktur. Das Datum stammt aus
-    # dem EXIF-Aufnahmedatum (Erstelldatum des Bildes), nicht aus dem Dateisystem.
+    # Foto: AI-Name + GPS-basierte Country/City-Struktur. Das EXIF-Aufnahmedatum hat
+    # Vorrang und bestimmt den Dateinamen (Datei-Zeitstempel bleiben unberücksichtigt).
     image_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".jpg"]
     assert len(image_targets) == 1
     image_target = image_targets[0]
@@ -186,14 +183,19 @@ def test_full_pipeline_processes_all_input_files(e2e_env: dict) -> None:
     assert image_target.parent == media_dir / EXPECTED_IMAGE_YEAR / "Germany" / "Hodenhagen"
     _assert_only_valid_location_folders(media_dir)
 
-    # Audio: Metadaten-basierter Name direkt im Jahresordner. Ohne EXIF greift
-    # für das Datum der Datei-Zeitstempel (hier das Kopierdatum = heute). Auch
-    # der Metadaten-Stamm ist PascalCase ("audio_..." -> "Audio...").
+    # Audio: Metadaten-basierter Name direkt im Jahresordner. Ohne EXIF ist für eine
+    # kopierte Datei die (von copy2 erhaltene) Quell-mtime beweisbar das älteste gültige
+    # Datum - Erstell-/Kopierdatum und aktuelles Datum liegen stets später. Erwartung
+    # daher aus der Quell-mtime ableiten (robust auch bei frischem Checkout, wo git die
+    # mtime auf die Auscheck-Zeit setzt). Auch der Stamm ist PascalCase ("audio..." -> "Audio...").
+    audio_mtime = (REPO_INPUT_DIR / EXPECTED_AUDIO).stat().st_mtime
+    expected_audio_date = datetime.fromtimestamp(audio_mtime).date().isoformat()
+    expected_audio_year = expected_audio_date.split("-")[0]
     audio_targets = [p for p in _all_files_recursive(media_dir) if p.suffix == ".aac"]
     assert len(audio_targets) == 1
     audio_target = audio_targets[0]
-    assert audio_target.name.startswith(f"{today}_Audio")
-    assert audio_target.parent == media_dir / audio_year
+    assert audio_target.name.startswith(f"{expected_audio_date}_Audio")
+    assert audio_target.parent == media_dir / expected_audio_year
 
     # Inhalts-Garantie: Die Pipeline benennt nur um/verschiebt - die Dateien
     # selbst (insb. das Foto trotz AI-Downscaling) bleiben bit-identisch

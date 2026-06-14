@@ -235,35 +235,98 @@ def _extract_image_capture_datetime(path: Path) -> Optional[datetime]:
         return None
 
 
-def get_file_creation_date(path: Path) -> str:
-    """Gibt das Erstellungsdatum der Datei im Format YYYY-MM-DD zurück.
+def _get_file_modification_datetime(path: Path) -> Optional[datetime]:
+    """Liest das Änderungsdatum (``st_mtime``) der Datei.
 
-    Bei Bildern wird zuerst das EXIF-Aufnahmedatum (``DateTimeOriginal``)
-    verwendet, da dies dem tatsächlichen Erstelldatum des Bildes entspricht.
-    Der Datei-Zeitstempel (`st_ctime`) ist dafür ungeeignet, weil er beim
-    Kopieren oder Download auf den aktuellen Zeitpunkt gesetzt wird. Nur wenn
-    kein EXIF-Aufnahmedatum vorliegt, wird auf `st_ctime` und schließlich auf
-    das aktuelle Datum zurückgegriffen.
+    Das Änderungsdatum überdauert in der Regel einen Kopier- oder Sync-Vorgang
+    (``shutil.copy2`` sowie die meisten Sync-Tools übernehmen ``mtime``), während
+    das Erstelldatum dabei auf den Kopierzeitpunkt gesetzt wird. Deshalb rangiert
+    es in der Datums-Priorität vor dem Erstelldatum.
+
+    Returns:
+            ``datetime`` des letzten Änderungszeitpunkts oder ``None`` bei Fehler.
+    """
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime)
+    except Exception as e:
+        logger.debug(f"Konnte Änderungsdatum nicht lesen für {path}: {e}")
+        return None
+
+
+def _get_file_creation_datetime(path: Path) -> Optional[datetime]:
+    """Liest das Erstelldatum der Datei.
+
+    Bevorzugt ``st_birthtime`` (echte Geburtszeit der Datei; verfügbar u. a. auf
+    Windows, macOS/BSD und neueren Linux-Kernen via ``statx``). Fehlt sie, dient
+    ``st_ctime`` als Rückfallebene - auf Windows ebenfalls die Erstellzeit, auf
+    Linux der Zeitpunkt der letzten Inode-Änderung.
+
+    Returns:
+            ``datetime`` des Erstellzeitpunkts oder ``None`` bei Fehler.
+    """
+    try:
+        stat_result = path.stat()
+        birthtime = getattr(stat_result, "st_birthtime", None)
+        timestamp = birthtime if birthtime is not None else stat_result.st_ctime
+        return datetime.fromtimestamp(timestamp)
+    except Exception as e:
+        logger.debug(f"Konnte Erstelldatum nicht lesen für {path}: {e}")
+        return None
+
+
+def get_file_creation_date(path: Path) -> str:
+    """Ermittelt das maßgebliche Datum einer Datei als ISO-String ``YYYY-MM-DD``.
+
+    Zweistufige Bestimmung:
+
+    1. Liegt ein gültiges **EXIF-Aufnahmedatum** (``DateTimeOriginal``) vor, wird
+       dieses verwendet - es ist der tatsächliche Entstehungszeitpunkt des Bildes
+       und hat Vorrang vor allen Datei-Zeitstempeln. So kann ein künstlich alter
+       Datei-Zeitstempel (z. B. aus einem Restore) das Aufnahmedatum nicht
+       überstimmen.
+    2. Fehlt ein Aufnahmedatum, wird aus den übrigen *gültigen* Datumsangaben das
+       **älteste** gewählt:
+
+       - **Änderungsdatum** - Datei-``mtime``.
+       - **Erstelldatum** - ``st_birthtime`` bzw. ``st_ctime`` der Datei.
+       - **Aktuelles Datum** - immer verfügbar (Fallback, zugleich stets das jüngste).
+
+       Hintergrund: Kopier-, Download- und Sync-Vorgänge setzen einzelne
+       Zeitstempel auf den (späteren) Verarbeitungszeitpunkt; ohne Aufnahmedatum
+       kommt der älteste der übrigen Werte dem Entstehungszeitpunkt am nächsten.
 
     Diese Funktion ist öffentlich, damit andere Module (z. B. Router)
-    konsistent das Datum aus den Metadaten beziehen können.
+    konsistent dasselbe Datum aus den Metadaten beziehen können.
 
     Args:
             path: Pfad zur Datei.
 
     Returns:
-            Datum als ISO-String `YYYY-MM-DD`.
+            Datum als ISO-String ``YYYY-MM-DD``.
     """
+    # 1. Aufnahmedatum (EXIF DateTimeOriginal) hat Vorrang, sofern vorhanden und gültig.
     capture = _extract_image_capture_datetime(path)
     if capture is not None:
         return capture.date().isoformat()
 
-    try:
-        ctime = path.stat().st_ctime
-        return datetime.fromtimestamp(ctime).date().isoformat()
-    except Exception as e:
-        logger.debug(f"Konnte Erstelldatum nicht lesen für {path}: {e}")
-        return datetime.now().date().isoformat()
+    # 2. Andernfalls: ältestes der übrigen gültigen Datumsangaben.
+    candidates: list[datetime] = []
+
+    # Änderungsdatum (mtime)
+    modified = _get_file_modification_datetime(path)
+    if modified is not None:
+        candidates.append(modified)
+
+    # Erstelldatum (birthtime/ctime)
+    created = _get_file_creation_datetime(path)
+    if created is not None:
+        candidates.append(created)
+
+    # Aktuelles Datum ist immer verfügbar (Fallback und zugleich stets das jüngste).
+    candidates.append(datetime.now())
+
+    oldest = min(candidates)
+    return oldest.date().isoformat()
 
 
 def _dms_to_decimal(dms, ref: str) -> float:
