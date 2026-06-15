@@ -18,6 +18,10 @@ from filemind.integrations.metadata_extractor import (
 SAMPLE_IMAGE = Path(__file__).parent / "input" / "20260527_114047.jpg"
 SAMPLE_IMAGE_EXIF_DATE = "2026-05-27"
 
+# Reales Beispielbild OHNE jegliches EXIF-Datum (weitergereichtes Foto). Sein echtes
+# Aufnahmedatum steckt nur im Datei-Zeitstempel - es darf kein Datum erfunden werden.
+NO_EXIF_IMAGE = Path(__file__).parent / "fixtures" / "no_exif_date.jpg"
+
 
 def test_image_creation_date_uses_exif_not_filesystem(tmp_path):
     """Regression: Das EXIF-Aufnahmedatum hat Vorrang vor den Datei-Zeitstempeln.
@@ -54,6 +58,29 @@ def test_extract_image_capture_datetime_none_for_non_image(tmp_path):
     p.write_text("kein bild")
 
     assert _extract_image_capture_datetime(p) is None
+
+
+def test_real_image_without_exif_uses_oldest_file_date(tmp_path):
+    """Regression mit echtem Beispielbild ohne EXIF-Datum (gemeldeter Adler-Fall):
+    Es darf kein Aufnahmedatum erfunden werden; maßgeblich ist das älteste gültige
+    Datei-Datum - nicht ein jüngeres Erstell-/Verarbeitungsdatum.
+
+    Das echte Aufnahmedatum steckt hier nur in der mtime. Da git die mtime beim
+    Checkout zurücksetzt, wird sie deterministisch auf den bekannten Wert gesetzt.
+    """
+    pytest.importorskip("PIL")
+    assert NO_EXIF_IMAGE.is_file(), f"Test-Fixture fehlt: {NO_EXIF_IMAGE}"
+
+    img = tmp_path / "adler.jpg"
+    shutil.copy2(NO_EXIF_IMAGE, img)
+
+    capture_ts = datetime.datetime(2026, 5, 29, 11, 41, 16).timestamp()
+    os.utime(img, (capture_ts, capture_ts))
+
+    # Das reale Bild hat kein EXIF-Aufnahmedatum -> es darf keines erfunden werden.
+    assert _extract_image_capture_datetime(img) is None
+    # Ältestes gültiges Datum ist die (gesetzte) mtime, nicht der jüngere ctime/now.
+    assert get_file_creation_date(img) == "2026-05-29"
 
 
 # EXIF-Tag-IDs für die feldgenaue Prüfung der Aufnahmedatum-Erkennung.
