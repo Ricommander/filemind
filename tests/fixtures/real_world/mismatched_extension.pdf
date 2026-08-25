@@ -1,0 +1,88 @@
+# Images included in the Library of Congress' "Free to Use and Reuse Sets" Cover Sheet
+
+The files in this dataset are derived from the [Free-to-Use and Reuse sets](https://www.loc.gov/free-to-use/) on loc.gov. This page provides contextual information to situate the data contained in the dataset in relation to the source material presented on loc.gov. For more specific details regarding the creation and contents of the dataset, please consult the technical README file.  
+
+## Version information
+Version 1.0 | Last updated 2023-05-05  
+
+## I. CONTENT ADVISORY
+
+Please note that terminology in historical materials and in Library descriptions does not always match the language preferred by members of the communities depicted, and may include negative stereotypes or words that offend.  
+
+## II. Information about the item or collection
+
+### a. Brief description & background of collection
+
+Free to Use and Reuse is a collection of themed sets curated by Library staff. Themes are intentionally varied, to illustrate the depth and breadth of the Library’s collections.  Themes have included skyscrapers, natural disasters, birds, shoes, games and more. These sets are just a small sample of the Library's digital collections that are free to use and reuse. The Library believes that this content is either in the public domain, has no known copyright, or has been cleared by the copyright owner for public use. The digital collections comprise millions of items including books, newspapers, manuscripts, prints and photos, maps, musical scores, films, sound recordings and more. A new set is usually added every month.
+
+### b. Original format
+Wide range of formats  
+
+### c. Library of Congress reading room
+For more information please contact the Ask a Librarian Service at [https://ask.loc.gov/](https://ask.loc.gov/).  
+
+### d. Contact
+
+For more information please contact the Ask a Librarian Service at [https://ask.loc.gov/](https://ask.loc.gov/).  
+
+### e. Metadata type
+The data available through the API for this dataset is sourced and transformed from many different types of records, including, but not limited to MARC records, MODS records, bespoke database records, and more.  
+
+### f. Scale of description
+Because items are drawn from many collections, level of description may vary  
+
+### g. Rights information
+
+The Free to Use and Reuse Sets are curated selections from the Library's digital collections that are either in the public domain, have no known copyright, or have been cleared by the copyright owner for public use. For more information, see [https://www.loc.gov/free-to-use/](https://www.loc.gov/free-to-use/).   
+
+## III. Information about the dataset
+
+### a. Description
+
+This dataset was created as part of an LC Labs experiment in collaboration with AVP to understand the benefits, risks, quality benchmarks, workflows, compilation methods, transformations, and documentation practices required to assemble datasets for public use in the cloud.  
+
+The goal of this dataset in particular is to explore ways of combining items from multiple collections, across media types, with different forms of existing metadata into a single, cohesive dataset. Although the Free to Use and Reuse Sets were originally created on specific themes, the comprehensive dataset will not only allow users to rearrange and reimagine the contents according to themes and priorities of their own, but to also consider the ways in which organizational schemes can tell us about the priorities of the people and institutions that created them. Through the creation of this dataset for the experiment, LC Labs and AVP aimed to learn:  
+* how we can harmonize data from different collections into a general purpose dataset. 
+* what fields will usually need special attention for standardization.
+* what fields are more likely to have greater variability in semantics or syntax.
+* what can we assume will be lost when combining data from multiple collections.
+* what potential assumptions might be unintentionally supported by combining data from multiple collections.  
+
+The dataset is organized by digital object, with each row (CSV) or JSON object representing a single digital object from the collection.  
+
+The data package contains:
+
+- full data package, zipped (1012.4 MB)
+- *README.md:* technical overview of how the data set was created (41 KB)
+- *cover-sheet.md and cover-sheet.pdf:* a more substantive overview of the data and the collection from which it is derived (6 KB and 215.2 KB)
+- *metadata.json* : a JSON file containing the metadata for all *2,688* items (15 MB)
+- *metadata.jsonl* : a JSON lines version of the JSON data, with one record per line, useful for processing large files (10.6 MB)
+- *metadata.csv:* a CSV transformation of the original JSON metadata (9.4 MB)
+- *manifest.txt:* a text file listing each file asset id, MD5 hash (base64), and location of the files in the data set (219.8 KB)
+- *data/:* directory of the file assets (for asset-based datasets)
+- *summary/:* directory of summary data (.csv) and visualizations (.jpg) of the fields included in the dataset and number of records populated for each, date histograms, and location distribution of dataset records (168 KB)
+- *sample-data/:* 100 randomly selected items from the *2,688* item set and their corresponding full text extracts have been provided as sample data. Included with this are a `metadata.csv`, `metadata.json`, `metadata.jsonl'`, and `manifest.txt`.  (zip 37.1 MB)  
+
+For more technical information, please see the associated README file.  
+
+### b. Data Summary
+
+Date coverage -- number of items by year  
+![Date histogram](summary/date-distribution.jpg)  
+
+Location coverage -- number of items by state  
+![State histogram](summary/state-distribution.jpg)  
+
+Date and location coverage data are available as CSV files in the summary directory of the data package along with a CSV file summarizing population of all dataset fields.  
+
+## IV. Feedback
+
+For curatorial questions about the content of the collection please contact the Library's Ask a Librarian service at [https://ask.loc.gov/prints-photographs](https://ask.loc.gov/prints-photographs). 
+
+For questions about download and access or technical questions about the dataset formats and composition, please reach out to the LC Labs Team  at LC-Labs@loc.gov.
+
+## V. Creator and contributor information
+
+Dataset creator & contributors: AVP, LC Labs
+
+Cover sheet author & contributors: AVP, LC Labs

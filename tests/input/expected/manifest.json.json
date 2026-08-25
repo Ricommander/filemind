@@ -1,0 +1,5 @@
+{
+  "file": "manifest.json",
+  "mode": "scan",
+  "expected_class": "corrupt"
+}

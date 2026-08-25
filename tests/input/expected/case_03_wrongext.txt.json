@@ -1,0 +1,5 @@
+{
+  "file": "case_03_wrongext.txt",
+  "mode": "generate",
+  "expected_class": "wrong_extension"
+}

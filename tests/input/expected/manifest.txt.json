@@ -1,0 +1,5 @@
+{
+  "file": "manifest.txt",
+  "mode": "scan",
+  "expected_class": "valid"
+}

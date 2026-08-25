@@ -1,0 +1,5 @@
+{
+  "file": "metadata.jsonl",
+  "mode": "scan",
+  "expected_class": "valid"
+}

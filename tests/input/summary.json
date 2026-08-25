@@ -1,0 +1,9 @@
+{
+  "count": 2693,
+  "by_class": {
+    "corrupt": 8,
+    "valid": 2679,
+    "wrong_extension": 4,
+    "trailing_garbage": 2
+  }
+}

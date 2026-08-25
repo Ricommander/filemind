@@ -1,0 +1,5 @@
+{
+  "file": "ftu\\cover-sheet.md",
+  "mode": "scan",
+  "expected_class": "valid"
+}
