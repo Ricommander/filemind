@@ -68,6 +68,87 @@ def test_route_file_real_image_calls_ai_and_storage(
     assert called["storage"]
 
 
+def test_route_file_reprocessing_bypasses_duplicate_detection_and_reaches_storage(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    document_path = tmp_path / "report.txt"
+    document_path.write_text("document content", encoding="utf-8")
+    called = {"dedup": False, "storage": False}
+
+    def fake_dedup(file_info):
+        called["dedup"] = True
+        return True
+
+    def fake_storage(
+        file_info, file_type, action="move", ai_name=None, reprocess_processed=False
+    ):
+        called["storage"] = True
+        assert reprocess_processed is True
+        return True
+
+    monkeypatch.setattr(router, "_handle_deduplication", fake_dedup)
+    monkeypatch.setattr(router, "_handle_storage", fake_storage)
+
+    assert router.route_file(document_path, reprocess_processed=True) is True
+    assert called == {"dedup": False, "storage": True}
+
+
+def test_route_file_reports_storage_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    document_path = tmp_path / "report.txt"
+    document_path.write_text("document content", encoding="utf-8")
+
+    class Classification:
+        file_type = FileType.TEXT_DOCUMENT
+        confidence = 1.0
+        file_info = type("FileInfo", (), {"path": document_path})()
+
+    monkeypatch.setattr(router, "_is_known_duplicate", lambda path: False)
+    monkeypatch.setattr(router, "_handle_deduplication", lambda path: False)
+    monkeypatch.setattr(router, "classify_file", lambda path: Classification())
+    monkeypatch.setattr(router, "_handle_storage", lambda *args, **kwargs: False)
+
+    assert router.route_file(document_path, reprocess_processed=True) is False
+
+
+def test_reprocessing_stored_document_keeps_same_path_without_suffix(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    documents_dir = tmp_path / "documents"
+    documents_dir.mkdir()
+    document_path = documents_dir / "report.txt"
+    document_path.write_text("document content", encoding="utf-8")
+    monkeypatch.setattr(
+        router,
+        "get_config",
+        lambda: {
+            "storage": {
+                "base_media_path": str(tmp_path / "media"),
+                "base_documents_path": str(documents_dir),
+            }
+        },
+    )
+    monkeypatch.setattr("filemind.storage.hash_store.compute_sha256", lambda path: "hash")
+    monkeypatch.setattr(
+        "filemind.storage.hash_store.is_hash_in_directory",
+        lambda *args: pytest.fail("forced reprocessing must bypass storage deduplication"),
+    )
+    monkeypatch.setattr("filemind.storage.hash_store.register_file", lambda path: None)
+
+    class FileInfo:
+        path = document_path
+
+    assert (
+        router._handle_storage(
+            FileInfo(), FileType.TEXT_DOCUMENT, action="move", reprocess_processed=True
+        )
+        is True
+    )
+    assert document_path.read_text(encoding="utf-8") == "document content"
+    assert not (documents_dir / "report_1.txt").exists()
+
+
 def test_handle_storage_uses_configured_max_files_per_folder(
     monkeypatch: "pytest.MonkeyPatch", tmp_path: Path
 ) -> None:
@@ -99,8 +180,12 @@ def test_handle_storage_uses_configured_max_files_per_folder(
     monkeypatch.setattr(
         "filemind.integrations.metadata_extractor.get_file_creation_date", lambda path: "2026-05-01"
     )
+
     monkeypatch.setattr(
-        "filemind.integrations.metadata_extractor.get_country_city_from_file", lambda path: None
+        "filemind.integrations.metadata_extractor.get_country_city_from_file",
+        lambda *args, **kwargs: pytest.fail(
+            "location metadata must not be read for audio files"
+        ),
     )
     monkeypatch.setattr(
         "filemind.integrations.metadata_extractor.extract_metadata_name", lambda path: "sample"
@@ -153,7 +238,8 @@ def test_handle_storage_ignores_subfolder_files_for_year_capacity(
         "filemind.integrations.metadata_extractor.get_file_creation_date", lambda path: "2026-05-01"
     )
     monkeypatch.setattr(
-        "filemind.integrations.metadata_extractor.get_country_city_from_file", lambda path: None
+        "filemind.integrations.metadata_extractor.get_country_city_from_file",
+        lambda path, **kwargs: None,
     )
     monkeypatch.setattr(
         "filemind.integrations.metadata_extractor.extract_metadata_name", lambda path: "sample"
@@ -209,7 +295,7 @@ def test_handle_storage_full_city_folder_rolls_over_to_next_year_folder(
     )
     monkeypatch.setattr(
         "filemind.integrations.metadata_extractor.get_country_city_from_file",
-        lambda path: {"country": "Deutschland", "city": "Hodenhagen"},
+        lambda path, **kwargs: {"country": "Deutschland", "city": "Hodenhagen"},
     )
 
     class FileInfo:
@@ -277,7 +363,8 @@ def test_handle_ai_naming_renames_real_image_when_enabled(
 
     monkeypatch.setattr(router, "get_config", lambda: {"ai": {"enabled": True}})
     monkeypatch.setattr(
-        "filemind.integrations.ai_naming.generate_smart_name", lambda path: "photo_renamed.jpg"
+        "filemind.integrations.ai_naming.generate_smart_name",
+        lambda path, file_type=None: "photo_renamed.jpg",
     )
 
     class FileInfo:
@@ -305,7 +392,8 @@ def test_handle_ai_naming_does_not_truncate_mid_word(
 
     monkeypatch.setattr(router, "get_config", lambda: {"ai": {"enabled": True}})
     monkeypatch.setattr(
-        "filemind.integrations.ai_naming.generate_smart_name", lambda path: suggestion
+        "filemind.integrations.ai_naming.generate_smart_name",
+        lambda path, file_type=None: suggestion,
     )
 
     class FileInfo:
@@ -337,13 +425,7 @@ def test_handle_deduplication_only_checks_duplicate_without_registering(
     monkeypatch.setattr("filemind.storage.hash_store.is_duplicate", fake_is_duplicate)
     monkeypatch.setattr("filemind.storage.hash_store.register_file", fake_register_file)
 
-    class FileInfo:
-        pass
-
-    file_info = FileInfo()
-    file_info.path = file_path
-
-    result = router._handle_deduplication(file_info)
+    result = router._handle_deduplication(file_path)
 
     assert result is False
     assert not called["registered"]
@@ -367,16 +449,25 @@ def test_handle_deduplication_detects_duplicate(
     monkeypatch.setattr("filemind.storage.hash_store.is_duplicate", fake_is_duplicate)
     monkeypatch.setattr("filemind.storage.hash_store.register_file", fake_register_file)
 
-    class FileInfo:
-        pass
-
-    file_info = FileInfo()
-    file_info.path = file_path
-
-    result = router._handle_deduplication(file_info)
+    result = router._handle_deduplication(file_path)
 
     assert result is True
     assert not called["registered"]
+
+
+def test_duplicate_is_checked_before_classification(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    file_path = tmp_path / "duplicate.jpg"
+    file_path.write_bytes(b"duplicate content")
+    monkeypatch.setattr("filemind.storage.hash_store.is_duplicate", lambda path: True)
+    monkeypatch.setattr(
+        router,
+        "classify_file",
+        lambda path: pytest.fail("duplicate must be skipped before classification"),
+    )
+
+    assert router.route_file(file_path) is False
 
 
 def test_route_file_logs_and_hashes_duplicate_only_once(

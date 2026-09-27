@@ -34,9 +34,13 @@ die Konfigurationswerte.
 from __future__ import annotations
 
 import base64
+import json
 import logging
+import math
 import os
 import re
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -46,6 +50,7 @@ from filemind.classification.classifier import classify_file
 from filemind.config import get_language, get_section
 from filemind.core.models import FileType
 from filemind.logging_utils.logger import get_logger
+from filemind.performance import measure
 
 logger = logging.getLogger(__name__)
 ollama_logger = get_logger("filemind.integrations.ai_naming.ollama")
@@ -85,6 +90,16 @@ _NAME_PROMPT_TEMPLATE = (
     "DESCRIPTION: {description}\n\n"
     "Reply with the filename stem only."
 )
+
+_LOCATION_PROMPT = (
+    "Identify the country and city where this photo was taken from visible evidence only. "
+    "Do not infer a location from the file name or metadata. Do not guess; use null when "
+    "the place cannot be identified confidently. Return only JSON in this exact shape: "
+    '{"country":{"name":string|null,"confidence":number},'
+    '"city":{"name":string|null,"confidence":number}}. '
+    "Give each confidence as a percentage from 0 to 100, independently for country and city."
+)
+LOCATION_CONFIDENCE_THRESHOLD = 95.0
 
 # Sprachspezifische Präfixe für deterministische Fallback-Namen
 _DUMMY_PREFIXES = {
@@ -166,6 +181,7 @@ def _ollama_generate(
     images: Optional[List[str]] = None,
     num_predict: int = 128,
     temperature: float = 0.2,
+    purpose: str = "generation",
 ) -> Optional[str]:
     """Schickt einen Generate-Request an Ollama und liefert den Antworttext.
 
@@ -195,9 +211,30 @@ def _ollama_generate(
         payload["images"] = images
 
     try:
-        resp = requests.post(endpoint, json=payload, timeout=cfg["timeout"])
-        resp.raise_for_status()
-        data = resp.json()
+        with measure(
+            "ai.ollama_request",
+            purpose=purpose,
+            model=cfg["model"],
+            prompt_characters=len(prompt),
+            image_count=len(images or []),
+            timeout_seconds=cfg["timeout"],
+        ) as metrics:
+            resp = requests.post(endpoint, json=payload, timeout=cfg["timeout"])
+            resp.raise_for_status()
+            data = resp.json()
+            if isinstance(data, dict):
+                for field in (
+                    "total_duration",
+                    "load_duration",
+                    "prompt_eval_count",
+                    "prompt_eval_duration",
+                    "eval_count",
+                    "eval_duration",
+                ):
+                    value = data.get(field)
+                    if isinstance(value, (int, float)):
+                        suffix = "_ns" if field.endswith("_duration") else ""
+                        metrics[f"ollama_{field}{suffix}"] = value
     except Exception as e:
         ollama_logger.warning(f"Ollama-Request fehlgeschlagen ({endpoint}): {e}")
         return None
@@ -247,16 +284,30 @@ def _encode_image_base64(path: Path) -> Optional[str]:
 
         from PIL import Image, ImageOps
 
-        with Image.open(path) as img:
-            # EXIF-Rotation anwenden, damit das Modell das Bild richtig herum sieht
-            img = ImageOps.exif_transpose(img)
-            original_size = img.size
-            if max(img.size) > max_size:
-                img.thumbnail((max_size, max_size))
-            if img.mode not in ("RGB", "L"):
-                img = img.convert("RGB")
-            buffer = BytesIO()
-            img.save(buffer, format="JPEG", quality=85)
+        input_size = path.stat().st_size
+        with measure(
+            "ai.image_encode",
+            bytes_processed=input_size,
+            max_image_size=max_size,
+        ) as measurement:
+            with Image.open(path) as img:
+                # EXIF-Rotation anwenden, damit das Modell das Bild richtig herum sieht
+                img = ImageOps.exif_transpose(img)
+                original_size = img.size
+                if max(img.size) > max_size:
+                    img.thumbnail((max_size, max_size))
+                if img.mode not in ("RGB", "L"):
+                    img = img.convert("RGB")
+                buffer = BytesIO()
+                img.save(buffer, format="JPEG", quality=85)
+                encoded_size = buffer.tell()
+                output_size = img.size
+
+            measurement["input_width"] = original_size[0]
+            measurement["input_height"] = original_size[1]
+            measurement["output_width"] = output_size[0]
+            measurement["output_height"] = output_size[1]
+            measurement["encoded_bytes"] = encoded_size
 
         logger.debug(
             f"Bild für AI-Naming verkleinert: {path.name} "
@@ -267,11 +318,114 @@ def _encode_image_base64(path: Path) -> Optional[str]:
     except Exception as e:
         logger.debug(f"Bild-Verkleinerung nicht möglich ({e}), sende Original: {path.name}")
 
+    # RAW-Dateien lassen sich oft nicht direkt mit Pillow öffnen. ExifTool kann
+    # eingebettete JPEG-Vorschauen liefern, ohne das Originalbild zu verändern.
+    preview = _extract_embedded_image_preview(path)
+    if preview:
+        try:
+            from io import BytesIO
+
+            from PIL import Image
+
+            with Image.open(BytesIO(preview)) as image:
+                image.thumbnail((max_size, max_size))
+                if image.mode not in ("RGB", "L"):
+                    image = image.convert("RGB")
+                buffer = BytesIO()
+                image.save(buffer, format="JPEG", quality=85)
+            return base64.b64encode(buffer.getvalue()).decode("ascii")
+        except Exception as e:
+            logger.debug(f"Eingebettete RAW-Vorschau nicht lesbar ({e}): {path.name}")
+
     try:
         return base64.b64encode(path.read_bytes()).decode("ascii")
     except Exception as e:
         logger.warning(f"Konnte Bild nicht lesen für AI-Naming: {path}: {e}")
         return None
+
+
+def _extract_embedded_image_preview(path: Path) -> Optional[bytes]:
+    """Extrahiert eine JPEG-Vorschau aus RAW-Dateien, sofern ExifTool vorhanden ist."""
+    executable = shutil.which("exiftool")
+    if not executable:
+        return None
+    for tag in ("PreviewImage", "JpgFromRaw", "ThumbnailImage"):
+        try:
+            result = subprocess.run(
+                [executable, "-b", f"-{tag}", str(path)],
+                capture_output=True,
+                check=True,
+                timeout=30,
+            )
+            if result.stdout:
+                return result.stdout
+        except Exception:
+            continue
+    return None
+
+
+def infer_image_location(path: Path) -> Optional[Dict[str, Any]]:
+    """Erkennt Land und Stadt getrennt und akzeptiert nur Konfidenz ab 95 %."""
+    encoded = _encode_image_base64(path)
+    if not encoded:
+        return None
+
+    response = _ollama_generate(
+        _LOCATION_PROMPT,
+        images=[encoded],
+        num_predict=256,
+        temperature=0,
+        purpose="image_location",
+    )
+    if not response:
+        return None
+
+    try:
+        result = json.loads(response)
+    except (TypeError, ValueError):
+        logger.warning("KI-Ortserkennung lieferte kein gültiges JSON; Ortsangaben verworfen")
+        return None
+
+    if not isinstance(result, dict):
+        logger.warning("KI-Ortserkennung lieferte ein unerwartetes Format; Ortsangaben verworfen")
+        return None
+
+    country, country_confidence = _accepted_location_field(result.get("country"))
+    city, city_confidence = _accepted_location_field(result.get("city"))
+    logger.info(
+        f"KI-Ortserkennung für {path.name}: Land={country or 'verworfen'} "
+        f"({country_confidence:.1f}%), Stadt={city or 'verworfen'} "
+        f"({city_confidence:.1f}%); Mindestvertrauen="
+        f"{LOCATION_CONFIDENCE_THRESHOLD:.0f}%"
+    )
+
+    if country is None and city is None:
+        return None
+    return {
+        "country": country,
+        "city": city,
+        "country_confidence": country_confidence,
+        "city_confidence": city_confidence,
+    }
+
+
+def _accepted_location_field(value: Any) -> tuple[Optional[str], float]:
+    if not isinstance(value, dict):
+        return None, 0.0
+    name = value.get("name")
+    confidence = value.get("confidence")
+    if isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
+        return None, 0.0
+    confidence = float(confidence)
+    if not math.isfinite(confidence):
+        return None, 0.0
+    if not 0 <= confidence <= 100:
+        return None, confidence
+    if not isinstance(name, str) or not name.strip():
+        return None, confidence
+    if confidence < LOCATION_CONFIDENCE_THRESHOLD:
+        return None, confidence
+    return name.strip(), confidence
 
 
 def describe_image(path: Path) -> Optional[str]:
@@ -288,7 +442,12 @@ def describe_image(path: Path) -> Optional[str]:
         return None
 
     prompt = _DESCRIBE_PROMPT_TEMPLATE.format(language_name=_language_name())
-    description = _ollama_generate(prompt, images=[encoded], num_predict=DESCRIBE_NUM_PREDICT)
+    description = _ollama_generate(
+        prompt,
+        images=[encoded],
+        num_predict=DESCRIBE_NUM_PREDICT,
+        purpose="image_description",
+    )
     if description:
         ollama_logger.info(f"Bildbeschreibung für {path.name}: {description}")
     return description
@@ -297,7 +456,9 @@ def describe_image(path: Path) -> Optional[str]:
 def _stem_from_description(description: str) -> Optional[str]:
     """Generiert aus einer Bildbeschreibung einen Dateinamens-Stamm."""
     prompt = _NAME_PROMPT_TEMPLATE.format(description=description, language_name=_language_name())
-    candidate = _ollama_generate(prompt, num_predict=STEM_NUM_PREDICT)
+    candidate = _ollama_generate(
+        prompt, num_predict=STEM_NUM_PREDICT, purpose="filename_stem"
+    )
     if not candidate:
         return None
 
@@ -387,7 +548,7 @@ def _generate_dummy_name(original_name: str, file_type: FileType) -> str:
     return f"{prefix}_{name_part}"
 
 
-def generate_smart_name(path: Path) -> str:
+def generate_smart_name(path: Path, file_type: Optional[FileType] = None) -> str:
     """Generiert einen intelligenten Dateinamens-Stamm für eine Datei.
 
     Für echte Fotos wird das konfigurierte Ollama-Vision-Modell genutzt:
@@ -411,13 +572,14 @@ def generate_smart_name(path: Path) -> str:
         logger.error(error_msg)
         raise ValueError(error_msg)
 
-    try:
-        classification = classify_file(path)
-    except FileNotFoundError as e:
-        logger.error(f"Klassifizierung fehlgeschlagen: {e}")
-        raise ValueError(str(e)) from e
+    if file_type is None:
+        try:
+            classification = classify_file(path)
+        except FileNotFoundError as e:
+            logger.error(f"Klassifizierung fehlgeschlagen: {e}")
+            raise ValueError(str(e)) from e
+        file_type = classification.file_type
 
-    file_type = classification.file_type
     logger.info(f"Generiere Namen für: {path.name} (Typ: {file_type.value})")
 
     if file_type == FileType.REAL_IMAGE:

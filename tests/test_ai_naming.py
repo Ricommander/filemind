@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import base64
+import json
+from contextlib import contextmanager
+from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Dict, Optional
 
 import pytest
@@ -217,6 +222,93 @@ def test_generate_smart_name_image_uses_describe_then_name(
     assert calls[1]["options"]["num_ctx"] == ai_naming.DEFAULT_NUM_CTX
 
 
+@pytest.mark.parametrize(
+    ("country_confidence", "city_confidence", "expected_country", "expected_city"),
+    [
+        (95, 94.9, "Germany", None),
+        (94.9, 95, None, "Berlin"),
+        (95, 95, "Germany", "Berlin"),
+        (94, 94, None, None),
+    ],
+)
+def test_infer_image_location_applies_independent_confidence_thresholds(
+    ai_config: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    country_confidence: float,
+    city_confidence: float,
+    expected_country: Optional[str],
+    expected_city: Optional[str],
+) -> None:
+    image_path = tmp_path / "photo.jpg"
+    image_path.write_bytes(b"fake image data")
+    monkeypatch.setattr(ai_naming, "_encode_image_base64", lambda path: "encoded")
+    monkeypatch.setattr(
+        ai_naming,
+        "_ollama_generate",
+        lambda *args, **kwargs: json.dumps(
+            {
+                "country": {"name": "Germany", "confidence": country_confidence},
+                "city": {"name": "Berlin", "confidence": city_confidence},
+            }
+        ),
+    )
+
+    location = ai_naming.infer_image_location(image_path)
+
+    if expected_country is None and expected_city is None:
+        assert location is None
+    else:
+        assert location is not None
+        assert location["country"] == expected_country
+        assert location["city"] == expected_city
+        assert location["country_confidence"] == country_confidence
+        assert location["city_confidence"] == city_confidence
+
+
+def test_infer_image_location_rejects_invalid_confidence(
+    ai_config: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    image_path = tmp_path / "photo.jpg"
+    image_path.write_bytes(b"fake image data")
+    monkeypatch.setattr(ai_naming, "_encode_image_base64", lambda path: "encoded")
+    monkeypatch.setattr(
+        ai_naming,
+        "_ollama_generate",
+        lambda *args, **kwargs: json.dumps(
+            {
+                "country": {"name": "Germany", "confidence": 101},
+                "city": {"name": "Berlin", "confidence": True},
+            }
+        ),
+    )
+
+    assert ai_naming.infer_image_location(image_path) is None
+
+
+def test_encode_raw_image_uses_downscaled_embedded_preview(
+    ai_config: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from PIL import Image
+
+    raw_path = tmp_path / "photo.nef"
+    raw_path.write_bytes(b"raw image data")
+    preview = BytesIO()
+    Image.new("RGB", (40, 30), color="red").save(preview, format="JPEG")
+    monkeypatch.setattr(ai_naming, "_load_ai_config", lambda: {"max_image_size": 16})
+    monkeypatch.setattr(ai_naming.shutil, "which", lambda name: "exiftool")
+    monkeypatch.setattr(
+        ai_naming.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(stdout=preview.getvalue()),
+    )
+
+    encoded = ai_naming._encode_image_base64(raw_path)
+    assert encoded is not None
+    with Image.open(BytesIO(base64.b64decode(encoded))) as result:
+        assert max(result.size) <= 16
+
+
 def test_generate_smart_name_falls_back_to_description_stem(
     ai_config: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -268,6 +360,22 @@ def test_generate_smart_name_audio_does_not_call_ollama(
     assert name == "audio_song"
 
 
+def test_generate_smart_name_reuses_supplied_file_type(
+    ai_config: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    audio_path = tmp_path / "song.mp3"
+    audio_path.write_bytes(b"fake audio data")
+    monkeypatch.setattr(
+        ai_naming,
+        "classify_file",
+        lambda path: pytest.fail("provided file type should avoid a second classification"),
+    )
+
+    assert ai_naming.generate_smart_name(audio_path, file_type=ai_naming.FileType.AUDIO) == (
+        "audio_song"
+    )
+
+
 def test_ollama_generate_handles_invalid_response(
     ai_config: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -290,6 +398,42 @@ def test_ollama_generate_handles_http_error(
     )
 
     assert ai_naming._ollama_generate("prompt") is None
+
+
+def test_ollama_generate_records_purpose_and_server_timings(
+    ai_config: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    metrics: Dict[str, Any] = {}
+
+    @contextmanager
+    def capture_measurement(stage: str, **fields: Any):
+        metrics.update(stage=stage, **fields)
+        yield metrics
+
+    monkeypatch.setattr(ai_naming, "measure", capture_measurement)
+    monkeypatch.setattr(
+        ai_naming.requests,
+        "post",
+        lambda *args, **kwargs: FakeResponse(
+            {
+                "response": "a tree",
+                "total_duration": 1200,
+                "load_duration": 300,
+                "prompt_eval_count": 80,
+                "prompt_eval_duration": 400,
+                "eval_count": 12,
+                "eval_duration": 500,
+            }
+        ),
+    )
+
+    assert ai_naming._ollama_generate("describe image", purpose="image_description") == "a tree"
+    assert metrics["stage"] == "ai.ollama_request"
+    assert metrics["purpose"] == "image_description"
+    assert metrics["ollama_total_duration_ns"] == 1200
+    assert metrics["ollama_load_duration_ns"] == 300
+    assert metrics["ollama_prompt_eval_count"] == 80
+    assert metrics["ollama_eval_count"] == 12
 
 
 def test_describe_image_sends_base64_image(

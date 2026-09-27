@@ -13,6 +13,12 @@ logging:
   console_enabled: true                # Print to console
   console_level: "WARNING"             # Only print warnings and errors to console
 
+# Performance Diagnostics
+performance:
+  enabled: true                        # Write machine-readable stage metrics
+  max_log_mb: 10                       # Rotate performance.jsonl at this size
+  backup_count: 3                      # Number of rotated performance logs to keep
+
 # Daemon Configuration
 daemon:
   input_directories:                   # Directories to watch for new files
@@ -21,6 +27,7 @@ daemon:
     - path: "/media/storage_main/altes_backup"
       action: "move"
   poll_interval: 300                  # Check for new files every 300 seconds (5 minutes)
+  reprocess_processed: true          # Einmalig bereits gespeicherte Dateien erneut verarbeiten
 
 # Storage Configuration
 storage:
@@ -30,9 +37,9 @@ storage:
   reinit_hash_store: false                                 # Whether to reinitialize the hash store on startup (WARNING: This will cause all files to be reprocessed)
   hash_db_path: ".filemind/hash_store.db"                  # SQLite database for SHA-256 deduplication
 
-# AI Naming (Ollama)
+# AI image analysis and naming (Ollama)
 ai:
-  enabled: true                        # Enable AI-powered smart naming for photos
+  enabled: true                        # Enable AI-based image naming and location fallback
   provider: "ollama"                   # Currently only "ollama" is supported
   model: "qwen3-vl:2b-instruct"        # Vision model used to describe images and derive names
   url: "http://localhost:11434"        # Base URL of the local Ollama server
@@ -60,6 +67,7 @@ classification:
     - ".webp"
     - ".tiff"
     - ".heic"
+    - ".nef"
 
   # Text document extensions (TEXT_DOCUMENT)
   text_document_extensions:

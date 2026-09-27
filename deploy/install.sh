@@ -26,6 +26,16 @@ if ! id -u "${SERVICE_USER}" &>/dev/null; then
     useradd --system --home-dir "${INSTALL_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
 fi
 
+if ! command -v exiftool >/dev/null 2>&1; then
+    if ! command -v apt-get >/dev/null 2>&1; then
+        echo "ExifTool fehlt; automatische Installation wird nur auf Debian/Ubuntu unterstützt." >&2
+        exit 1
+    fi
+    echo "==> Installiere ExifTool für vollständige Bildmetadaten"
+    apt-get update
+    apt-get install -y libimage-exiftool-perl
+fi
+
 echo "==> Kopiere Projekt nach ${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 rsync -a --delete \

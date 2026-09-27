@@ -1,0 +1,1 @@
+For every request involving implementation, debugging, refactoring, or review in this repository, follow the project workflow and quality requirements in [the filemind-quality skill](./skills/filemind-quality/SKILL.md). Treat those requirements as applicable even when the user does not invoke the skill explicitly.

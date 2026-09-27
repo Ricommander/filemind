@@ -1,0 +1,789 @@
+2026-09-25 00:01:55 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4557.jpg: Ein Mann mit Brille hält eine kleine Babys auf dem Schoß und sitzt an einem Tisch in einer Küche.
+2026-09-25 00:02:09 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mann_babys_kueche'
+2026-09-25 00:02:09 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mann_babys_kueche.jpg
+2026-09-25 00:02:11 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4979.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:02:11 - filemind.routing.router - INFO - Klassifizierung: 4979.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 00:02:12 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4979.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:02:12 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4979.jpg (Typ: real_image)
+2026-09-25 00:15:34 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4979.jpg: Ein kleines Kind sitzt in einem Hochstuhl und füttert sich mit einer rosa Gabel.
+2026-09-25 00:15:48 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'klein_hochstuhl_rosa_gabel'
+2026-09-25 00:15:48 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_klein_hochstuhl_rosa_gabel.jpg
+2026-09-25 00:15:49 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4433.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:15:49 - filemind.routing.router - INFO - Klassifizierung: 4433.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 00:15:50 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4433.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:15:50 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4433.jpg (Typ: real_image)
+2026-09-25 00:29:11 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4433.jpg: Ein Strauch mit grünen Blättern und kleinen Früchten wächst an einer Wand im Garten.
+2026-09-25 00:29:24 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baum_frucht_gruen_wand'
+2026-09-25 00:29:24 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baum_frucht_gruen_wand.jpg
+2026-09-25 00:29:26 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4576.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:29:26 - filemind.routing.router - INFO - Klassifizierung: 4576.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 00:29:27 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4576.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:29:27 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4576.jpg (Typ: real_image)
+2026-09-25 00:42:51 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4576.jpg: Ein kleines Baby mit blondem Haar und einem dunkelblauen Kleid mit rosa Punkten sitzt auf einer Person im Freien, die eine Hand auf den Arm des Babys legt.
+2026-09-25 00:43:09 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleines_baby_dunkelblau_rose_punkte_freizeit'
+2026-09-25 00:43:09 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleines_baby_dunkelblau_rose_punkte_freizeit.jpg
+2026-09-25 00:43:11 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49343.jpg' - erkannter Text-Länge: 7
+2026-09-25 00:43:11 - filemind.routing.router - INFO - Klassifizierung: 49343.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 00:43:13 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49343.jpg' - erkannter Text-Länge: 7
+2026-09-25 00:43:13 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 49343.jpg (Typ: real_image)
+2026-09-25 00:55:59 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 49343.jpg: Eine lächelnde Mädchen mit einer bunten Vogelspinne auf dem Kopf steht im Zoo und ist von einem Mann begleitet.
+2026-09-25 00:56:14 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lachende_maedchen_vogelspinne_zoo'
+2026-09-25 00:56:14 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-29_lachende_maedchen_vogelspinne_zoo.jpg
+2026-09-25 00:56:16 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4683.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:56:16 - filemind.routing.router - INFO - Klassifizierung: 4683.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 00:56:18 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4683.jpg' - erkannter Text-Länge: 0
+2026-09-25 00:56:18 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4683.jpg (Typ: real_image)
+2026-09-25 01:09:01 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4683.jpg: Eine Mutter und ihr Baby liegen auf dem Bett.
+2026-09-25 01:09:04 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mutter_baby_liegend'
+2026-09-25 01:09:04 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mutter_baby_liegend.jpg
+2026-09-25 01:09:12 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5155.jpg' - erkannter Text-Länge: 6
+2026-09-25 01:09:12 - filemind.routing.router - INFO - Klassifizierung: 5155.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 01:09:13 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5155.jpg' - erkannter Text-Länge: 6
+2026-09-25 01:09:13 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5155.jpg (Typ: real_image)
+2026-09-25 01:22:39 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5155.jpg: Ein älterer Mann hält ein kleines Kind auf dem Schoß und sitzt auf einem Sofa; im Hintergrund sind zwei Bilder an der Wand – eines zeigt eine belebte Straße, das andere eine Szene in Havanna mit Autos.
+2026-09-25 01:24:03 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'alter_mann_kinder_sofa_2018_havanna_bilder_german_stem'
+2026-09-25 01:24:03 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_alter_mann_kinder_sofa_2018_havanna_bilder_german_stem.jpg
+2026-09-25 01:24:06 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21763.jpg' - erkannter Text-Länge: 0
+2026-09-25 01:24:06 - filemind.routing.router - INFO - Klassifizierung: 21763.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 01:24:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21763.jpg' - erkannter Text-Länge: 0
+2026-09-25 01:24:07 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 21763.jpg (Typ: real_image)
+2026-09-25 01:37:29 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 21763.jpg: Eine lächelnde kleine Mädchen mit roten Haaren steht auf einem gepflasterten Platz und hält eine rosa Frisbee in der Hand.
+2026-09-25 01:37:44 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lachende_maedchen_rote_haar_park_frisbee'
+2026-09-25 01:37:44 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_lachende_maedchen_rote_haar_park_frisbee.jpg
+2026-09-25 01:37:50 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45711.jpg' - erkannter Text-Länge: 202
+2026-09-25 01:37:50 - filemind.routing.router - INFO - Klassifizierung: 45711.jpg -> document_image (Vertrauen: 0.75)
+2026-09-25 01:37:50 - filemind.routing.router - INFO - Führe OCR durch: 45711.jpg
+2026-09-25 01:37:55 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45711.jpg' - erkannter Text-Länge: 202
+2026-09-25 01:37:55 - filemind.routing.router - INFO - OCR erfolgreich: 202 Zeichen extrahiert
+2026-09-25 01:37:57 - filemind.integrations.ocr - INFO - OCR erfolgreich für '20289.jpg' - erkannter Text-Länge: 0
+2026-09-25 01:37:57 - filemind.routing.router - INFO - Klassifizierung: 20289.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 01:38:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '20289.jpg' - erkannter Text-Länge: 0
+2026-09-25 01:38:00 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 20289.jpg (Typ: real_image)
+2026-09-25 01:51:13 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 20289.jpg: Die Hauptfigur des Fotos ist ein großes LEGO-Modell eines Schiffs mit rotem Rumpf und blauem Wasser, das auf einem Tisch steht. Im Hintergrund befindet sich eine schwarze Darth Vader-Haube auf einem Lautsprecher und ein Computerbildschirm.
+2026-09-25 01:52:38 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lego_schiff_rote_rumpf_blau_wasser_tisch_darth_vader'
+2026-09-25 01:52:38 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_lego_schiff_rote_rumpf_blau_wasser_tisch_darth_vader.jpg
+2026-09-25 01:52:43 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45869.jpg' - erkannter Text-Länge: 6
+2026-09-25 01:52:43 - filemind.routing.router - INFO - Klassifizierung: 45869.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 01:52:47 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45869.jpg' - erkannter Text-Länge: 6
+2026-09-25 01:52:47 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 45869.jpg (Typ: real_image)
+2026-09-25 02:05:33 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 45869.jpg: Ein Gruppe von Kindern in leuchtenden, fluoreszierenden Rennanzügen posiert in einem dunklen Raum mit Neonlichtern und Skateboards an der Wand.
+2026-09-25 02:05:49 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'leuchtender_rallye_kinder_2023'
+2026-09-25 02:05:49 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_leuchtender_rallye_kinder_2023.jpg
+2026-09-25 02:06:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4903.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:06:03 - filemind.routing.router - INFO - Klassifizierung: 4903.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 02:06:04 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4903.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:06:04 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4903.jpg (Typ: real_image)
+2026-09-25 02:19:27 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4903.jpg: Das Bild zeigt eine Dokumentation mit einer Tabelle, die Ergebnisse der Erhebung zur Ermittlung der Pflegegrade für Patienten darstellt.
+2026-09-25 02:19:42 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'pflege_erhebung_tabelle'
+2026-09-25 02:19:42 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_pflege_erhebung_tabelle.jpg
+2026-09-25 02:19:44 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18572.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:19:44 - filemind.routing.router - INFO - Klassifizierung: 18572.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 02:19:46 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18572.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:19:46 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 18572.jpg (Typ: real_image)
+2026-09-25 02:33:07 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 18572.jpg: Ein junges Mädchen mit roten Haaren steht neben einer dunklen Metallwand und hält sich an der Wand fest.
+2026-09-25 02:33:22 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'roter_haar_junges_maedchen_stehend_an_der_wand'
+2026-09-25 02:33:22 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_roter_haar_junges_maedchen_stehend_an_der_wand.jpg
+2026-09-25 02:33:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4429.jpg' - erkannter Text-Länge: 8
+2026-09-25 02:33:36 - filemind.routing.router - INFO - Klassifizierung: 4429.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 02:33:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4429.jpg' - erkannter Text-Länge: 8
+2026-09-25 02:33:37 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4429.jpg (Typ: real_image)
+2026-09-25 02:46:57 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4429.jpg: Ein Mann hält eine kleine Mädchen und ein Baby auf dem Schoß in einer Küche.
+2026-09-25 02:47:00 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kinder_kueche_mann_123'
+2026-09-25 02:47:00 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kinder_kueche_mann_123.jpg
+2026-09-25 02:47:04 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14080.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:47:04 - filemind.routing.router - INFO - Klassifizierung: 14080.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 02:47:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14080.jpg' - erkannter Text-Länge: 0
+2026-09-25 02:47:07 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 14080.jpg (Typ: real_image)
+2026-09-25 02:59:52 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 14080.jpg: Vier Personen – zwei Erwachsene und ein Kind – stehen auf einem Weg durch einen dichten Wald.
+2026-09-25 03:00:06 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'wald_junge_familie_2'
+2026-09-25 03:00:06 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_wald_junge_familie_2.jpg
+2026-09-25 03:00:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4921.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:00:08 - filemind.routing.router - INFO - Klassifizierung: 4921.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 03:00:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4921.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:00:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4921.jpg (Typ: real_image)
+2026-09-25 03:13:48 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4921.jpg: Ein kleines Baby und ein Mädchen mit roten Haaren sitzen an einem Tisch und strecken ihre Hände aus, um die Fingernägel des Babys zu küssen.
+2026-09-25 03:14:04 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_maedchen_rote_haare_strecken_haende'
+2026-09-25 03:14:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleine_maedchen_rote_haare_strecken_haende.jpg
+2026-09-25 03:14:18 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5033.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:14:18 - filemind.routing.router - INFO - Klassifizierung: 5033.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 03:14:19 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5033.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:14:19 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5033.jpg (Typ: real_image)
+2026-09-25 03:27:46 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5033.jpg: Ein grüner, gepackter Gipsförmiger Kuschelhocker mit einem gelben Etikett und einer grauen Decke in der Verpackung.
+2026-09-25 03:28:05 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'gruener_gipskuschelhocker_wei_beta_koffer'
+2026-09-25 03:28:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_gruener_gipskuschelhocker_wei_beta_koffer.jpg
+2026-09-25 03:28:19 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48512.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:28:19 - filemind.routing.router - INFO - Klassifizierung: 48512.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 03:28:21 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48512.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:28:21 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 48512.jpg (Typ: real_image)
+2026-09-25 03:41:07 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 48512.jpg: Drei Zebras stehen auf einer Wiese vor einem dichten Wald.
+2026-09-25 03:41:22 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'zebra_wald_wiese_drei'
+2026-09-25 03:41:22 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-27_zebra_wald_wiese_drei.jpg
+2026-09-25 03:41:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5087.jpg' - erkannter Text-Länge: 11
+2026-09-25 03:41:36 - filemind.routing.router - INFO - Klassifizierung: 5087.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 03:41:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5087.jpg' - erkannter Text-Länge: 11
+2026-09-25 03:41:37 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5087.jpg (Typ: real_image)
+2026-09-25 03:55:09 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5087.jpg: Ein Menü mit verschiedenen Speisen und Getränken, das auf einem Tisch oder einer Karte angebracht ist.
+2026-09-25 03:55:49 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'menu_gesicht_essen_getranken_tafel'
+2026-09-25 03:55:49 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_menu_gesicht_essen_getranken_tafel.jpg
+2026-09-25 03:56:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5069.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:56:03 - filemind.routing.router - INFO - Klassifizierung: 5069.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 03:56:04 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5069.jpg' - erkannter Text-Länge: 0
+2026-09-25 03:56:04 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5069.jpg (Typ: real_image)
+2026-09-25 04:11:04 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900.0)
+2026-09-25 04:11:04 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_5069'
+2026-09-25 04:11:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_foto_5069.jpg
+2026-09-25 04:11:21 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18125.jpg' - erkannter Text-Länge: 11
+2026-09-25 04:11:21 - filemind.routing.router - INFO - Klassifizierung: 18125.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 04:11:24 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18125.jpg' - erkannter Text-Länge: 11
+2026-09-25 04:11:24 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 18125.jpg (Typ: real_image)
+2026-09-25 04:26:24 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900.0)
+2026-09-25 04:26:24 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_18125'
+2026-09-25 04:26:24 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_foto_18125.jpg
+2026-09-25 04:26:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14958.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:26:40 - filemind.routing.router - INFO - Klassifizierung: 14958.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 04:26:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14958.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:26:42 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 14958.jpg (Typ: real_image)
+2026-09-25 04:40:30 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-09-25 04:40:30 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_14958'
+2026-09-25 04:40:30 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_foto_14958.jpg
+2026-09-25 04:40:47 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4572.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:40:47 - filemind.routing.router - INFO - Klassifizierung: 4572.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 04:40:48 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4572.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:40:48 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4572.jpg (Typ: real_image)
+2026-09-25 04:46:45 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4572.jpg: Ein Baby sitzt auf einer Person im Freien und wird von den Händen der Mutter gehalten.
+2026-09-25 04:47:06 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_mutter_freizeit_123'
+2026-09-25 04:47:06 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_mutter_freizeit_123.jpg
+2026-09-25 04:47:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4705.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:47:08 - filemind.routing.router - INFO - Klassifizierung: 4705.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 04:47:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4705.jpg' - erkannter Text-Länge: 0
+2026-09-25 04:47:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4705.jpg (Typ: real_image)
+2026-09-25 05:00:30 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4705.jpg: Ein junges Mädchen mit roten Haaren sitzt im Auto und hält eine Eiscreme mit einer Popsicle-Spitze, die auf ihrem Gesicht verstreut ist.
+2026-09-25 05:00:47 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'roter_haar_jugendliche_maedchen_eiscreme_popsicle'
+2026-09-25 05:00:47 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_roter_haar_jugendliche_maedchen_eiscreme_popsicle.jpg
+2026-09-25 05:00:51 - filemind.integrations.ocr - INFO - OCR erfolgreich für '46067.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:00:51 - filemind.routing.router - INFO - Klassifizierung: 46067.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 05:00:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '46067.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:00:54 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 46067.jpg (Typ: real_image)
+2026-09-25 05:13:39 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 46067.jpg: Ein Künstlerarbeitsplatz mit einer leuchtenden Malerei auf einem Staffelei, umgeben von farbenfrohen Neon-Sprüchen und großen Buchstaben in der Nacht.
+2026-09-25 05:13:57 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kunst_arbeitsplatz_neon_buchstaben_staffelei_leuchtend'
+2026-09-25 05:13:57 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kunst_arbeitsplatz_neon_buchstaben_staffelei_leuchtend.jpg
+2026-09-25 05:14:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48516.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:14:00 - filemind.routing.router - INFO - Klassifizierung: 48516.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 05:14:02 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48516.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:14:02 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 48516.jpg (Typ: real_image)
+2026-09-25 05:26:45 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 48516.jpg: Ein Bus fährt durch eine Landschaft mit grünen Bäumen und einem Spielplatz im Hintergrund, während Passagiere auf den Sitzen schauen.
+2026-09-25 05:27:01 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'bus_gruen_baum_spielplatz_2023_04_15'
+2026-09-25 05:27:01 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-27_bus_gruen_baum_spielplatz_2023_04_15.jpg
+2026-09-25 05:27:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5096.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:27:03 - filemind.routing.router - INFO - Klassifizierung: 5096.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 05:27:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5096.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:27:03 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5096.jpg (Typ: real_image)
+2026-09-25 05:40:21 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5096.jpg: Ein kleines Kind in einem rosa Kleid kniet auf dem Boden und betrachtet eine Treppe.
+2026-09-25 05:40:34 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'klein_pink_kinder_treppe'
+2026-09-25 05:40:34 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_klein_pink_kinder_treppe.jpg
+2026-09-25 05:40:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5398.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:40:36 - filemind.routing.router - INFO - Klassifizierung: 5398.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 05:40:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5398.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:40:37 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5398.jpg (Typ: real_image)
+2026-09-25 05:53:57 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5398.jpg: Eine kleine Mädchen mit roten Haaren sitzt auf einem bunten Spielmatte und hält eine rote Gummibänder-Schleife vor die Brust.
+2026-09-25 05:54:12 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_rote_haar_spielmatte_gummiband'
+2026-09-25 05:54:12 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleine_rote_haar_spielmatte_gummiband.jpg
+2026-09-25 05:54:15 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50142.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:54:15 - filemind.routing.router - INFO - Klassifizierung: 50142.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 05:54:17 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50142.jpg' - erkannter Text-Länge: 0
+2026-09-25 05:54:17 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 50142.jpg (Typ: real_image)
+2026-09-25 06:07:07 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 50142.jpg: Die Aufnahme zeigt eine moderne, mehrstufige Architektur mit einer hohen Betonkonstruktion und einem offenen Raum, der durch Treppe und Stufen zu erreichen ist; im unteren Bereich sind Tische und Stühle sowie Personen zu sehen.
+2026-09-25 06:08:30 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'modern_beton_architektur_treppe_oberflaeche'
+2026-09-25 06:08:30 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-04_modern_beton_architektur_treppe_oberflaeche.jpg
+2026-09-25 06:08:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22590.jpg' - erkannter Text-Länge: 878
+2026-09-25 06:08:36 - filemind.classification.classifier - INFO - 22590.jpg: viel Text (133 Wörter), aber farbig (Farbwert=79.7 > 18.0) -> als Foto behandelt
+2026-09-25 06:08:36 - filemind.routing.router - INFO - Klassifizierung: 22590.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 06:08:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22590.jpg' - erkannter Text-Länge: 878
+2026-09-25 06:08:40 - filemind.classification.classifier - INFO - 22590.jpg: viel Text (133 Wörter), aber farbig (Farbwert=79.7 > 18.0) -> als Foto behandelt
+2026-09-25 06:08:40 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 22590.jpg (Typ: real_image)
+2026-09-25 06:22:02 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 22590.jpg: Ein E-Mail-Vermerk von Angela Rekitte mit der Nachricht über die verkürzten Öffnungszeiten des Kinderhauses am Dienstag, 06.06.2023.
+2026-09-25 06:22:20 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'angela_rekitte_kinderhaus_oeffnung_2023'
+2026-09-25 06:22:20 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_angela_rekitte_kinderhaus_oeffnung_2023.jpg
+2026-09-25 06:22:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50771.jpg' - erkannter Text-Länge: 2008
+2026-09-25 06:22:37 - filemind.classification.classifier - INFO - 50771.jpg: viel Text (250 Wörter), aber farbig (Farbwert=21.1 > 18.0) -> als Foto behandelt
+2026-09-25 06:22:37 - filemind.routing.router - INFO - Klassifizierung: 50771.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 06:22:53 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50771.jpg' - erkannter Text-Länge: 2008
+2026-09-25 06:22:53 - filemind.classification.classifier - INFO - 50771.jpg: viel Text (250 Wörter), aber farbig (Farbwert=21.1 > 18.0) -> als Foto behandelt
+2026-09-25 06:22:53 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 50771.jpg (Typ: real_image)
+2026-09-25 06:35:38 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 50771.jpg: Das Bild zeigt eine medizinische Formularseite der Deutschen Rentenversicherung, die die sozialmedizinische Leistungsbeurteilung und Epikrise einer Patientin beschreibt.
+2026-09-25 06:35:55 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'soziale_leistung_patient_institut_german_medical_form'
+2026-09-25 06:35:55 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-05_soziale_leistung_patient_institut_german_medical_form.jpg
+2026-09-25 06:35:59 - filemind.integrations.ocr - INFO - OCR erfolgreich für '6785.jpg' - erkannter Text-Länge: 245
+2026-09-25 06:35:59 - filemind.classification.classifier - INFO - 6785.jpg: viel Text (35 Wörter), aber farbig (Farbwert=55.2 > 18.0) -> als Foto behandelt
+2026-09-25 06:35:59 - filemind.routing.router - INFO - Klassifizierung: 6785.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 06:36:02 - filemind.integrations.ocr - INFO - OCR erfolgreich für '6785.jpg' - erkannter Text-Länge: 245
+2026-09-25 06:36:02 - filemind.classification.classifier - INFO - 6785.jpg: viel Text (35 Wörter), aber farbig (Farbwert=55.2 > 18.0) -> als Foto behandelt
+2026-09-25 06:36:02 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 6785.jpg (Typ: real_image)
+2026-09-25 06:49:28 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 6785.jpg: Das Bild zeigt eine Werbung für McDonald's mit dem Titel „Mit Mecces um die Welt“, die verschiedene Produkte aus 17 Ländern und 22 Highlights präsentiert, die im Sommer nach Deutschland geliefert wurden. Die wichtigsten Objekte sind ein Burger, ein McFlurry, ein Grimmace Shake, eine Karte mit einem Flugzeugmotiv und ein Logo von McDonald's.
+2026-09-25 06:53:06 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mecces_um_die_welt_17_laender_22_hilf'
+2026-09-25 06:53:06 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-01-20_mecces_um_die_welt_17_laender_22_hilf.jpg
+2026-09-25 06:53:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4144.jpg' - erkannter Text-Länge: 0
+2026-09-25 06:53:07 - filemind.routing.router - INFO - Klassifizierung: 4144.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 06:53:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4144.jpg' - erkannter Text-Länge: 0
+2026-09-25 06:53:08 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4144.jpg (Typ: real_image)
+2026-09-25 07:06:29 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4144.jpg: Ein Katze liegt auf einem Sofa und schläft neben einer weißen Tischplatte mit einem kleinen Kabel, während eine Person im Vordergrund die Beine ausgestreckt hat.
+2026-09-25 07:07:56 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'katze_sofa_sleep_tisch_kabel_person_weiss'
+2026-09-25 07:07:56 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_katze_sofa_sleep_tisch_kabel_person_weiss.jpg
+2026-09-25 07:08:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '19690.jpg' - erkannter Text-Länge: 115
+2026-09-25 07:08:00 - filemind.classification.classifier - INFO - 19690.jpg: viel Text (20 Wörter), aber farbig (Farbwert=48.9 > 18.0) -> als Foto behandelt
+2026-09-25 07:08:00 - filemind.routing.router - INFO - Klassifizierung: 19690.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 07:08:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '19690.jpg' - erkannter Text-Länge: 115
+2026-09-25 07:08:03 - filemind.classification.classifier - INFO - 19690.jpg: viel Text (20 Wörter), aber farbig (Farbwert=48.9 > 18.0) -> als Foto behandelt
+2026-09-25 07:08:03 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 19690.jpg (Typ: real_image)
+2026-09-25 07:21:09 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 19690.jpg: In einem Händlerladen sind mehrere Kartons mit Kunststoffregalen auf Pallets zu sehen, die teilweise mit Plastikfolie verpackt sind und eine orange Preisetikette mit „39,95“ zeigen.
+2026-09-25 07:22:32 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kunststoffregale_pallet_orange_39_95'
+2026-09-25 07:22:32 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kunststoffregale_pallet_orange_39_95.jpg
+2026-09-25 07:22:41 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49176.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:22:41 - filemind.routing.router - INFO - Klassifizierung: 49176.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 07:22:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49176.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:22:42 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 49176.jpg (Typ: real_image)
+2026-09-25 07:35:23 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 49176.jpg: Eine lächelnde Mädchen hält eine Eule auf ihrem Arm im Park.
+2026-09-25 07:35:26 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lachende_eule_park_maedchen'
+2026-09-25 07:35:26 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-29_lachende_eule_park_maedchen.jpg
+2026-09-25 07:35:29 - filemind.integrations.ocr - INFO - OCR erfolgreich für '11482.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:35:29 - filemind.routing.router - INFO - Klassifizierung: 11482.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 07:35:30 - filemind.integrations.ocr - INFO - OCR erfolgreich für '11482.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:35:30 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 11482.jpg (Typ: real_image)
+2026-09-25 07:48:51 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 11482.jpg: Ein kleines Baby sitzt in einem Kinderwagen und isst mit einer Gabel, die auf dem Schoß liegt.
+2026-09-25 07:49:05 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kinderwagen_baby_gabel'
+2026-09-25 07:49:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kinderwagen_baby_gabel.jpg
+2026-09-25 07:49:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44668.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:49:07 - filemind.routing.router - INFO - Klassifizierung: 44668.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 07:49:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44668.jpg' - erkannter Text-Länge: 0
+2026-09-25 07:49:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 44668.jpg (Typ: real_image)
+2026-09-25 08:01:54 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 44668.jpg: Ein kleines Mädchen beobachtet eine Schildkröte in einem Aquarium, das im Hintergrund mehrere Kühlschränke mit weiteren Tieren enthält.
+2026-09-25 08:02:10 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_schildkroete_aquarium_maedchen_kuehlschrank'
+2026-09-25 08:02:10 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-04-21_kleine_schildkroete_aquarium_maedchen_kuehlschrank.jpg
+2026-09-25 08:02:18 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4355.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:02:18 - filemind.routing.router - INFO - Klassifizierung: 4355.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 08:02:19 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4355.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:02:19 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4355.jpg (Typ: real_image)
+2026-09-25 08:15:38 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4355.jpg: Eine ältere Frau sitzt auf einem Sofa und hält ein Baby in ihren Armen, während im Hintergrund eine „BIRTHDAY“-Geburtstagsdekoration mit Luftballons zu sehen ist.
+2026-09-25 08:15:57 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'alter_frau_baby_sofa_birthday_dekorations_2023_12_15_12_34'
+2026-09-25 08:15:57 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_alter_frau_baby_sofa_birthday_dekorations_2023_12_15_12_34.jpg
+2026-09-25 08:16:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45392.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:16:00 - filemind.routing.router - INFO - Klassifizierung: 45392.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 08:16:02 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45392.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:16:02 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 45392.jpg (Typ: real_image)
+2026-09-25 08:29:03 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 45392.jpg: Ein Junge spielt im Garten ein Korbwurf-Spiel mit fünf Kindern auf einer Wiese.
+2026-09-25 08:29:16 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'junge_garten_korbwurf'
+2026-09-25 08:29:16 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-04-26_junge_garten_korbwurf.jpg
+2026-09-25 08:29:19 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48505.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:29:19 - filemind.routing.router - INFO - Klassifizierung: 48505.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 08:29:20 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48505.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:29:20 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 48505.jpg (Typ: real_image)
+2026-09-25 08:42:06 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 48505.jpg: Ein Bus fährt auf einer Wiese vor einem Wald und einem markanten, architektonischen Bauwerk unter klarem Himmel.
+2026-09-25 08:42:20 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'bus_wiese_wald_bauwerk'
+2026-09-25 08:42:20 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-27_bus_wiese_wald_bauwerk.jpg
+2026-09-25 08:42:23 - filemind.integrations.ocr - INFO - OCR erfolgreich für '20689.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:42:23 - filemind.routing.router - INFO - Klassifizierung: 20689.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 08:42:25 - filemind.integrations.ocr - INFO - OCR erfolgreich für '20689.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:42:25 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 20689.jpg (Typ: real_image)
+2026-09-25 08:55:45 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 20689.jpg: Ein junges Mädchen mit Gesichtsmalerei steht unter Wasser in einem Aquarium und blickt zur Kamera, während ein grüner Roboterwagen im Hintergrund schwimmt.
+2026-09-25 08:56:03 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'junges_maedchen_geruest_wasser_aquarium_gruen_roboter'
+2026-09-25 08:56:03 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_junges_maedchen_geruest_wasser_aquarium_gruen_roboter.jpg
+2026-09-25 08:56:05 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51241.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:56:05 - filemind.routing.router - INFO - Klassifizierung: 51241.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 08:56:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51241.jpg' - erkannter Text-Länge: 0
+2026-09-25 08:56:07 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 51241.jpg (Typ: real_image)
+2026-09-25 09:08:52 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 51241.jpg: Zwei Mädchen sitzen auf einem hölzernen Stuhl im Garten vor einer weißen Wand mit einem Fenster, das die Umgebung und einen Teil des Gebäudes reflektiert.
+2026-09-25 09:09:08 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'zweier_maedchen_garten_stuhl_wand_fenster'
+2026-09-25 09:09:08 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-09_zweier_maedchen_garten_stuhl_wand_fenster.jpg
+2026-09-25 09:09:11 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4507.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:09:11 - filemind.routing.router - INFO - Klassifizierung: 4507.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 09:09:12 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4507.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:09:12 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4507.jpg (Typ: real_image)
+2026-09-25 09:21:56 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4507.jpg: Eine Frau mit Kopfhörern und Brille hält ein Baby in einem Kinderwagen im Freien.
+2026-09-25 09:22:11 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mama_baby_kinderwagen_ohren_brille'
+2026-09-25 09:22:11 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mama_baby_kinderwagen_ohren_brille.jpg
+2026-09-25 09:22:13 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5167.jpg' - erkannter Text-Länge: 19
+2026-09-25 09:22:13 - filemind.routing.router - INFO - Klassifizierung: 5167.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 09:22:14 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5167.jpg' - erkannter Text-Länge: 19
+2026-09-25 09:22:14 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5167.jpg (Typ: real_image)
+2026-09-25 09:35:33 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5167.jpg: Ein kleines Kind mit rosa Mütze und weißer Jacke sitzt in einem Einkaufswagen in einer Supermarktkette.
+2026-09-25 09:35:48 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kinder_rose_muetze_einkaufswagen'
+2026-09-25 09:35:48 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kinder_rose_muetze_einkaufswagen.jpg
+2026-09-25 09:35:52 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14732.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:35:52 - filemind.routing.router - INFO - Klassifizierung: 14732.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 09:35:55 - filemind.integrations.ocr - INFO - OCR erfolgreich für '14732.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:35:55 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 14732.jpg (Typ: real_image)
+2026-09-25 09:48:38 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 14732.jpg: Drei Personen sitzen an einem festlich gedeckten Tisch mit Kerzen und einer Coca-Cola-Bottle im Hintergrund.
+2026-09-25 09:48:52 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'drei_personen_an_tisch'
+2026-09-25 09:48:52 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_drei_personen_an_tisch.jpg
+2026-09-25 09:49:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51656.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:49:00 - filemind.routing.router - INFO - Klassifizierung: 51656.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 09:49:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51656.jpg' - erkannter Text-Länge: 0
+2026-09-25 09:49:03 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 51656.jpg (Typ: real_image)
+2026-09-25 10:01:48 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 51656.jpg: Ein junges Mädchen mit roten Haaren und Brille sitzt in einer Optikgeschäftshalle, die vor ihr mehrere Regale mit Brillen zeigt.
+2026-09-25 10:02:04 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'junges_maedchen_rote_haar_brille_optikgeschaeft'
+2026-09-25 10:02:04 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-17_junges_maedchen_rote_haar_brille_optikgeschaeft.jpg
+2026-09-25 10:02:12 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5199.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:02:12 - filemind.routing.router - INFO - Klassifizierung: 5199.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 10:02:13 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5199.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:02:13 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5199.jpg (Typ: real_image)
+2026-09-25 10:15:32 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5199.jpg: Ein Vater hält ein Baby mit einer rosa Schleife auf dem Kopf und eine kleine Mädchen im Hintergrund, die ebenfalls eine Schleife trägt.
+2026-09-25 10:15:48 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'vater_kinder_schleifen_2023'
+2026-09-25 10:15:48 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_vater_kinder_schleifen_2023.jpg
+2026-09-25 10:15:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43031.jpg' - erkannter Text-Länge: 620
+2026-09-25 10:15:54 - filemind.routing.router - INFO - Klassifizierung: 43031.jpg -> document_image (Vertrauen: 0.75)
+2026-09-25 10:15:54 - filemind.routing.router - INFO - Führe OCR durch: 43031.jpg
+2026-09-25 10:15:58 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43031.jpg' - erkannter Text-Länge: 620
+2026-09-25 10:15:58 - filemind.routing.router - INFO - OCR erfolgreich: 620 Zeichen extrahiert
+2026-09-25 10:16:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44183.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:16:00 - filemind.routing.router - INFO - Klassifizierung: 44183.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 10:16:02 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44183.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:16:02 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 44183.jpg (Typ: real_image)
+2026-09-25 10:28:47 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 44183.jpg: Zwei Kinder sitzen auf einem Holzrocker in einer Kinderspielzeuggeschäft.
+2026-09-25 10:29:01 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kinderspielzeug_holzrocker_zwei_kinder'
+2026-09-25 10:29:01 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kinderspielzeug_holzrocker_zwei_kinder.jpg
+2026-09-25 10:29:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4928.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:29:03 - filemind.routing.router - INFO - Klassifizierung: 4928.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 10:29:04 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4928.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:29:04 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4928.jpg (Typ: real_image)
+2026-09-25 10:42:22 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4928.jpg: Ein Baby liegt auf einer Decke und hält ein leuchtend grünes Spielzeug mit bunten Teilen in den Händen.
+2026-09-25 10:42:37 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_gruen_spielzeug_bunte_teile'
+2026-09-25 10:42:37 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_gruen_spielzeug_bunte_teile.jpg
+2026-09-25 10:42:39 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5249.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:42:39 - filemind.routing.router - INFO - Klassifizierung: 5249.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 10:42:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5249.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:42:40 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5249.jpg (Typ: real_image)
+2026-09-25 10:55:58 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5249.jpg: Ein kleines Mädchen mit roten Haaren liegt im Bett und hat einen Katze neben sich, die auf dem Kissen sitzt.
+2026-09-25 10:56:13 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_katze_maedchen_ross_haar'
+2026-09-25 10:56:13 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleine_katze_maedchen_ross_haar.jpg
+2026-09-25 10:56:15 - filemind.integrations.ocr - INFO - OCR erfolgreich für '41715.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:56:15 - filemind.routing.router - INFO - Klassifizierung: 41715.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 10:56:17 - filemind.integrations.ocr - INFO - OCR erfolgreich für '41715.jpg' - erkannter Text-Länge: 0
+2026-09-25 10:56:17 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 41715.jpg (Typ: real_image)
+2026-09-25 11:09:01 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 41715.jpg: Ein Mann mit einer verletzten Fußgelenk- und Beinprothese sitzt auf einem Sofa mit einem kleinen Mädchen, die sich an ihn lehnt.
+2026-09-25 11:09:17 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mann_prothese_sofa_maedchen'
+2026-09-25 11:09:18 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-03-16_mann_prothese_sofa_maedchen.jpg
+2026-09-25 11:09:32 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18485.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:09:32 - filemind.routing.router - INFO - Klassifizierung: 18485.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 11:09:34 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18485.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:09:34 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 18485.jpg (Typ: real_image)
+2026-09-25 11:23:01 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 18485.jpg: Eine kleine Mädchen mit roten Haaren liegt im Auto und schläft.
+2026-09-25 11:23:04 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_maedchen_roter_haar_schlaf'
+2026-09-25 11:23:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleine_maedchen_roter_haar_schlaf.jpg
+2026-09-25 11:23:19 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4274.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:23:19 - filemind.routing.router - INFO - Klassifizierung: 4274.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 11:23:20 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4274.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:23:20 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4274.jpg (Typ: real_image)
+2026-09-25 11:36:39 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4274.jpg: Ein schlafendes Baby liegt auf einem grauen Kissen mit Sternenmuster und einer Stethoskop-Schlauch an der Seite.
+2026-09-25 11:36:55 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schlafendes_baby_stehoskop_kissen_sternenmuster'
+2026-09-25 11:36:55 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schlafendes_baby_stehoskop_kissen_sternenmuster.jpg
+2026-09-25 11:37:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4954.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:37:08 - filemind.routing.router - INFO - Klassifizierung: 4954.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 11:37:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4954.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:37:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4954.jpg (Typ: real_image)
+2026-09-25 11:50:29 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4954.jpg: Eine Mutter und ihr Baby liegen auf einer Picknickdecke im Garten, die sich mit einem kleinen Kind auf der grünen Wiese befindet.
+2026-09-25 11:50:45 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mutter_baby_picknick_wiese'
+2026-09-25 11:50:45 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mutter_baby_picknick_wiese.jpg
+2026-09-25 11:50:58 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4868.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:50:58 - filemind.routing.router - INFO - Klassifizierung: 4868.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 11:50:59 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4868.jpg' - erkannter Text-Länge: 0
+2026-09-25 11:50:59 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4868.jpg (Typ: real_image)
+2026-09-25 12:04:53 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4868.jpg: Ein Mann hält ein Baby in den Armen und lächelt in die Kamera.
+2026-09-25 12:05:13 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mann_baby_laechelt'
+2026-09-25 12:05:13 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mann_baby_laechelt.jpg
+2026-09-25 12:05:27 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49061.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:05:27 - filemind.routing.router - INFO - Klassifizierung: 49061.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 12:05:29 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49061.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:05:29 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 49061.jpg (Typ: real_image)
+2026-09-25 12:18:28 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 49061.jpg: Ein Strauch mit leuchtend pinken Blüten wächst an einem Weg im Park, umgeben von hohen Bäumen und grünem Unterholz.
+2026-09-25 12:19:10 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'pink_blume_strauch_park_baum'
+2026-09-25 12:19:10 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-29_pink_blume_strauch_park_baum.jpg
+2026-09-25 12:19:24 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4318.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:19:24 - filemind.routing.router - INFO - Klassifizierung: 4318.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 12:19:25 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4318.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:19:25 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4318.jpg (Typ: real_image)
+2026-09-25 12:33:38 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4318.jpg: Ein kleines Baby mit rosa Kleidung und floralen Muster ist im Bild zu sehen.
+2026-09-25 12:34:08 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'klein_baby_rosa_floral'
+2026-09-25 12:34:08 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_klein_baby_rosa_floral.jpg
+2026-09-25 12:34:25 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51310.jpg' - erkannter Text-Länge: 750
+2026-09-25 12:34:25 - filemind.classification.classifier - INFO - 51310.jpg: viel Text (103 Wörter), aber farbig (Farbwert=23.4 > 18.0) -> als Foto behandelt
+2026-09-25 12:34:25 - filemind.routing.router - INFO - Klassifizierung: 51310.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 12:34:28 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51310.jpg' - erkannter Text-Länge: 750
+2026-09-25 12:34:28 - filemind.classification.classifier - INFO - 51310.jpg: viel Text (103 Wörter), aber farbig (Farbwert=23.4 > 18.0) -> als Foto behandelt
+2026-09-25 12:34:28 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 51310.jpg (Typ: real_image)
+2026-09-25 12:49:28 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900.0)
+2026-09-25 12:49:28 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_51310'
+2026-09-25 12:49:29 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-11_foto_51310.jpg
+2026-09-25 12:49:46 - filemind.integrations.ocr - INFO - OCR erfolgreich für '40240.jpg' - erkannter Text-Länge: 547
+2026-09-25 12:49:46 - filemind.classification.classifier - INFO - 40240.jpg: viel Text (90 Wörter), aber farbig (Farbwert=25.8 > 18.0) -> als Foto behandelt
+2026-09-25 12:49:46 - filemind.routing.router - INFO - Klassifizierung: 40240.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 12:49:46 - filemind.routing.router - WARNING - Duplikat erkannt, wird übersprungen: 40240.jpg (wird in weiteren Durchläufen nicht erneut gemeldet)
+2026-09-25 12:49:49 - filemind.integrations.ocr - INFO - OCR erfolgreich für '17549.jpg' - erkannter Text-Länge: 575
+2026-09-25 12:49:49 - filemind.routing.router - INFO - Klassifizierung: 17549.jpg -> document_image (Vertrauen: 0.75)
+2026-09-25 12:49:49 - filemind.routing.router - INFO - Führe OCR durch: 17549.jpg
+2026-09-25 12:49:51 - filemind.integrations.ocr - INFO - OCR erfolgreich für '17549.jpg' - erkannter Text-Länge: 575
+2026-09-25 12:49:51 - filemind.routing.router - INFO - OCR erfolgreich: 575 Zeichen extrahiert
+2026-09-25 12:49:53 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48561.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:49:53 - filemind.routing.router - INFO - Klassifizierung: 48561.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 12:49:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '48561.jpg' - erkannter Text-Länge: 0
+2026-09-25 12:49:54 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 48561.jpg (Typ: real_image)
+2026-09-25 13:03:42 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 48561.jpg: Ein Tiger läuft auf einem grünen Rasenfeld vorbei.
+2026-09-25 13:04:11 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'tiger_gruen_rasen'
+2026-09-25 13:04:11 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-27_tiger_gruen_rasen.jpg
+2026-09-25 13:04:26 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22143.jpg' - erkannter Text-Länge: 22
+2026-09-25 13:04:26 - filemind.routing.router - INFO - Klassifizierung: 22143.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:04:28 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22143.jpg' - erkannter Text-Länge: 22
+2026-09-25 13:04:28 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 22143.jpg (Typ: real_image)
+2026-09-25 13:09:19 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-09-25 13:09:19 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_22143'
+2026-09-25 13:09:19 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_foto_22143.jpg
+2026-09-25 13:09:38 - filemind.integrations.ocr - INFO - OCR erfolgreich für '7012.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:09:38 - filemind.routing.router - INFO - Klassifizierung: 7012.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:09:45 - filemind.integrations.ocr - INFO - OCR erfolgreich für '7012.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:09:45 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 7012.jpg (Typ: real_image)
+2026-09-25 13:15:28 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 7012.jpg: Ein dunkelblauer, vierwelliger Reisekoffer mit Ausziehstange und dem Markennamen "Epic" auf der Vorderseite.
+2026-09-25 13:15:50 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'epic_reise_koffer_4wellig_blau'
+2026-09-25 13:15:51 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-21_epic_reise_koffer_4wellig_blau.jpg
+2026-09-25 13:15:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '13135.jpg' - erkannter Text-Länge: 36
+2026-09-25 13:15:54 - filemind.routing.router - INFO - Klassifizierung: 13135.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:15:56 - filemind.integrations.ocr - INFO - OCR erfolgreich für '13135.jpg' - erkannter Text-Länge: 36
+2026-09-25 13:15:56 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 13135.jpg (Typ: real_image)
+2026-09-25 13:29:05 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 13135.jpg: Ein Stapel von schwarzen Metallregalen mit einem gelben Preisschild, das 24,95 € anzeigt, steht vor einer Glaswand in einem Geschäft.
+2026-09-25 13:29:21 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schwarze_regale_gelbe_schild_24_95_euro'
+2026-09-25 13:29:21 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schwarze_regale_gelbe_schild_24_95_euro.jpg
+2026-09-25 13:29:23 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4855.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:29:23 - filemind.routing.router - INFO - Klassifizierung: 4855.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:29:25 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4855.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:29:25 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4855.jpg (Typ: real_image)
+2026-09-25 13:42:10 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4855.jpg: Ein kleines Baby sitzt auf einer Person und hält ein Spielzeug in den Händen.
+2026-09-25 13:42:46 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'klein_baby_spielzeug'
+2026-09-25 13:42:46 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_klein_baby_spielzeug.jpg
+2026-09-25 13:42:48 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4382.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:42:48 - filemind.routing.router - INFO - Klassifizierung: 4382.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:42:50 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4382.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:42:50 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4382.jpg (Typ: real_image)
+2026-09-25 13:55:35 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4382.jpg: Ein Baby liegt auf einer gelben Decke und hält die Hand eines Erwachsenen, der sich über ihm befindet.
+2026-09-25 13:55:49 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_erwachsener_hand_ober_der_gelbe_decke'
+2026-09-25 13:55:49 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_erwachsener_hand_ober_der_gelbe_decke.jpg
+2026-09-25 13:55:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '47607.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:55:54 - filemind.routing.router - INFO - Klassifizierung: 47607.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 13:55:58 - filemind.integrations.ocr - INFO - OCR erfolgreich für '47607.jpg' - erkannter Text-Länge: 0
+2026-09-25 13:55:58 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 47607.jpg (Typ: real_image)
+2026-09-25 14:08:43 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 47607.jpg: Zwei Wanderer stehen auf einem Felsengang und einer Person zeigt mit dem Finger in die Ferne.
+2026-09-25 14:08:56 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'wanderer_felsen_finger'
+2026-09-25 14:08:56 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-19_wanderer_felsen_finger.jpg
+2026-09-25 14:09:04 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21407.jpg' - erkannter Text-Länge: 323
+2026-09-25 14:09:04 - filemind.classification.classifier - INFO - 21407.jpg: viel Text (62 Wörter), aber farbig (Farbwert=98.8 > 18.0) -> als Foto behandelt
+2026-09-25 14:09:04 - filemind.routing.router - INFO - Klassifizierung: 21407.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 14:09:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21407.jpg' - erkannter Text-Länge: 323
+2026-09-25 14:09:09 - filemind.classification.classifier - INFO - 21407.jpg: viel Text (62 Wörter), aber farbig (Farbwert=98.8 > 18.0) -> als Foto behandelt
+2026-09-25 14:09:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 21407.jpg (Typ: real_image)
+2026-09-25 14:22:11 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 21407.jpg: Eine Person hält eine Aldi-Fachzeitschrift mit Angeboten für die Woche vom 18. bis 23. September, die auf einem gepolsterten Hintergrund liegt.
+2026-09-25 14:22:28 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'aldi_zeitung_18_23_september'
+2026-09-25 14:22:28 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_aldi_zeitung_18_23_september.jpg
+2026-09-25 14:22:31 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21777.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:22:31 - filemind.routing.router - INFO - Klassifizierung: 21777.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 14:22:33 - filemind.integrations.ocr - INFO - OCR erfolgreich für '21777.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:22:33 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 21777.jpg (Typ: real_image)
+2026-09-25 14:35:53 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 21777.jpg: Die Fotografie zeigt eine Frau mit einem markanten, aufsteigenden Haarschopf und einer leichten, selbstbewussten Pose.
+2026-09-25 14:36:08 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'frau_haarschopf_weissheit'
+2026-09-25 14:36:08 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_frau_haarschopf_weissheit.jpg
+2026-09-25 14:36:16 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18863.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:36:16 - filemind.routing.router - INFO - Klassifizierung: 18863.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 14:36:22 - filemind.integrations.ocr - INFO - OCR erfolgreich für '18863.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:36:22 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 18863.jpg (Typ: real_image)
+2026-09-25 14:49:10 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 18863.jpg: Die Aufnahme zeigt eine verschneite Aussicht von einem Balkon auf ein traditionelles Gebäude mit Schnee auf dem Dach und einer Spiralfahrt, die sich im Hintergrund befindet.
+2026-09-25 14:49:28 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schnee_balkon_traditionelle_spiral_1234'
+2026-09-25 14:49:28 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schnee_balkon_traditionelle_spiral_1234.jpg
+2026-09-25 14:49:31 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22960.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:49:31 - filemind.routing.router - INFO - Klassifizierung: 22960.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 14:49:34 - filemind.integrations.ocr - INFO - OCR erfolgreich für '22960.jpg' - erkannter Text-Länge: 0
+2026-09-25 14:49:34 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 22960.jpg (Typ: real_image)
+2026-09-25 15:02:22 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 22960.jpg: Die Aufnahme zeigt eine grüne Wiese mit zwei Bänken und einem Blick auf einen bewaldeten Hügel sowie ein kleines Dorf im Hintergrund.
+2026-09-25 15:02:37 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'gruen_wiese_benken_huegel_dorf'
+2026-09-25 15:02:37 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_gruen_wiese_benken_huegel_dorf.jpg
+2026-09-25 15:02:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4698.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:02:40 - filemind.routing.router - INFO - Klassifizierung: 4698.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 15:02:41 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4698.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:02:41 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4698.jpg (Typ: real_image)
+2026-09-25 15:15:28 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4698.jpg: Eine Frau mit Brille und einem Babys auf dem Bett, das mit einer blauen Kissen mit geometrischen Muster im Hintergrund liegt.
+2026-09-25 15:15:43 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'frau_baby_blau_geometrie'
+2026-09-25 15:15:43 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_frau_baby_blau_geometrie.jpg
+2026-09-25 15:15:45 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4285.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:15:45 - filemind.routing.router - INFO - Klassifizierung: 4285.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 15:15:46 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4285.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:15:46 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4285.jpg (Typ: real_image)
+2026-09-25 15:29:09 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4285.jpg: Ein Mann mit Brille hält ein neugeborenes Baby auf dem Arm und lächelt, während im Hintergrund eine moderne Deckenleuchte und ein Tisch zu sehen sind.
+2026-09-25 15:29:26 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'brille_baby_laechelnd_modern_leuchte_tisch'
+2026-09-25 15:29:26 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_brille_baby_laechelnd_modern_leuchte_tisch.jpg
+2026-09-25 15:29:28 - filemind.integrations.ocr - INFO - OCR erfolgreich für '42174.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:29:28 - filemind.routing.router - INFO - Klassifizierung: 42174.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 15:29:30 - filemind.integrations.ocr - INFO - OCR erfolgreich für '42174.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:29:30 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 42174.jpg (Typ: real_image)
+2026-09-25 15:42:17 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 42174.jpg: Ein kreisförmiger Kieselsteinbodenmuster auf einem asphaltierten Platz mit zwei Personen und mehreren Fahrzeugen im Hintergrund.
+2026-09-25 15:42:32 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kreis_stein_platz_mehrere_fahrzeuge_personen'
+2026-09-25 15:42:32 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-03-24_kreis_stein_platz_mehrere_fahrzeuge_personen.jpg
+2026-09-25 15:42:34 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4310.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:42:34 - filemind.routing.router - INFO - Klassifizierung: 4310.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 15:42:35 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4310.jpg' - erkannter Text-Länge: 0
+2026-09-25 15:42:35 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4310.jpg (Typ: real_image)
+2026-09-25 15:55:57 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4310.jpg: Ein lächelndes Baby mit rosa Flecken auf der Stirn und einem hellen Kleidungsaufkleber.
+2026-09-25 15:56:12 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lachend_baby_rosa_stirn_hell_kleider_1234'
+2026-09-25 15:56:12 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_lachend_baby_rosa_stirn_hell_kleider_1234.jpg
+2026-09-25 15:56:16 - filemind.integrations.ocr - INFO - OCR erfolgreich für '41346.jpg' - erkannter Text-Länge: 9
+2026-09-25 15:56:16 - filemind.routing.router - INFO - Klassifizierung: 41346.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 15:56:18 - filemind.integrations.ocr - INFO - OCR erfolgreich für '41346.jpg' - erkannter Text-Länge: 9
+2026-09-25 15:56:18 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 41346.jpg (Typ: real_image)
+2026-09-25 16:09:43 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 41346.jpg: Ein Kind mit blonden Haaren liegt im Vordergrund und blickt auf die Kamera, während eine Person in einem kleinen Bildfenster unten rechts zu sehen ist.
+2026-09-25 16:09:59 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kind_blond_sehen_bild'
+2026-09-25 16:09:59 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-03-10_kind_blond_sehen_bild.jpg
+2026-09-25 16:10:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5407.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:10:00 - filemind.routing.router - INFO - Klassifizierung: 5407.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 16:10:00 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5407.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:10:00 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5407.jpg (Typ: real_image)
+2026-09-25 16:23:22 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5407.jpg: Ein schlafendes Baby liegt auf einer Decke und ist mit einem rosa Kleidern bekleidet.
+2026-09-25 16:23:36 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schlafendes_baby_rosa_lege'
+2026-09-25 16:23:36 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schlafendes_baby_rosa_lege.jpg
+2026-09-25 16:23:38 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5107.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:23:38 - filemind.routing.router - INFO - Klassifizierung: 5107.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 16:23:39 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5107.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:23:39 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5107.jpg (Typ: real_image)
+2026-09-25 16:36:59 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5107.jpg: Ein lächelndes Baby sitzt in einem Hochstuhl mit einer Schürze und ist mit Essen bedeckt.
+2026-09-25 16:37:14 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'lachend_baby_hochstuhl_schuhe_ein_fett'
+2026-09-25 16:37:14 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_lachend_baby_hochstuhl_schuhe_ein_fett.jpg
+2026-09-25 16:37:17 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4399.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:37:17 - filemind.routing.router - INFO - Klassifizierung: 4399.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 16:37:18 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4399.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:37:18 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4399.jpg (Typ: real_image)
+2026-09-25 16:50:03 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4399.jpg: Ein Baby liegt auf einem braunen Kissen und schläft, während die Hände des Babys sichtbar sind.
+2026-09-25 16:50:18 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_braun_kissen_schlaf_hands'
+2026-09-25 16:50:18 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_braun_kissen_schlaf_hands.jpg
+2026-09-25 16:50:23 - filemind.integrations.ocr - INFO - OCR erfolgreich für '38802.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:50:23 - filemind.routing.router - INFO - Klassifizierung: 38802.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 16:50:26 - filemind.integrations.ocr - INFO - OCR erfolgreich für '38802.jpg' - erkannter Text-Länge: 0
+2026-09-25 16:50:26 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 38802.jpg (Typ: real_image)
+2026-09-25 17:03:12 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 38802.jpg: Eine junge Frau hält eine große, rosafarbene Luftballonform aus der Zahl „8“ über ihrem Kopf.
+2026-09-25 17:03:26 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'rosa_8_form_frau'
+2026-09-25 17:03:26 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-02-07_rosa_8_form_frau.jpg
+2026-09-25 17:03:28 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4213.jpg' - erkannter Text-Länge: 5
+2026-09-25 17:03:28 - filemind.routing.router - INFO - Klassifizierung: 4213.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 17:03:29 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4213.jpg' - erkannter Text-Länge: 5
+2026-09-25 17:03:29 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4213.jpg (Typ: real_image)
+2026-09-25 17:16:49 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4213.jpg: Ein Mann mit Brille und einem kleinen Baby liegt auf einer Couch im Schlaf.
+2026-09-25 17:16:52 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mann_baby_couch_lie'
+2026-09-25 17:16:52 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mann_baby_couch_lie.jpg
+2026-09-25 17:16:54 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51482.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:16:54 - filemind.routing.router - INFO - Klassifizierung: 51482.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 17:16:55 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51482.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:16:55 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 51482.jpg (Typ: real_image)
+2026-09-25 17:29:41 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 51482.jpg: Eine kleine Mädchen mit roten Haaren steht neben einem großen, braunen Teddybären in einer Spielzeuggeschäftshalle.
+2026-09-25 17:29:56 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_teddyschule_baer_maedchen'
+2026-09-25 17:29:56 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-12_kleine_teddyschule_baer_maedchen.jpg
+2026-09-25 17:29:57 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4629.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:29:57 - filemind.routing.router - INFO - Klassifizierung: 4629.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 17:29:58 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4629.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:29:58 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4629.jpg (Typ: real_image)
+2026-09-25 17:43:20 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4629.jpg: Ein junges Mädchen mit lockigem Haar steht in einem Spielzimmer auf einem bunten Teppich und hält die Arme ausgestreckt.
+2026-09-25 17:43:35 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'maedchen_teppich_haar'
+2026-09-25 17:43:35 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_maedchen_teppich_haar.jpg
+2026-09-25 17:43:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '46364.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:43:37 - filemind.routing.router - INFO - Klassifizierung: 46364.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 17:43:39 - filemind.integrations.ocr - INFO - OCR erfolgreich für '46364.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:43:39 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 46364.jpg (Typ: real_image)
+2026-09-25 17:56:24 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 46364.jpg: Zwei Mädchen sitzen an einem Tisch in einer Kneipe und essen gemeinsam mit ihren Lebensmitteln.
+2026-09-25 17:56:38 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'zweier_maedchen_ein_zuhause_essen'
+2026-09-25 17:56:38 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-03_zweier_maedchen_ein_zuhause_essen.jpg
+2026-09-25 17:56:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43458.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:56:40 - filemind.routing.router - INFO - Klassifizierung: 43458.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 17:56:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43458.jpg' - erkannter Text-Länge: 0
+2026-09-25 17:56:42 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 43458.jpg (Typ: real_image)
+2026-09-25 18:09:28 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 43458.jpg: Eine junge Frau mit roten Haaren und einer blauen Haarschleife steht in einem Kinderzimmer vor weißen Schränken und einem leuchtend bunten Teppich.
+2026-09-25 18:09:46 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'roter_haar_blau_schleife_kinderzimmer_bunt_teppich'
+2026-09-25 18:09:46 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-04-05_roter_haar_blau_schleife_kinderzimmer_bunt_teppich.jpg
+2026-09-25 18:09:47 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5259.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:09:47 - filemind.routing.router - INFO - Klassifizierung: 5259.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 18:09:48 - filemind.integrations.ocr - INFO - OCR erfolgreich für '5259.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:09:48 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 5259.jpg (Typ: real_image)
+2026-09-25 18:23:08 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 5259.jpg: Ein kleines Kind in einer roten Kinderwagenjacke und einem rosa Hut sitzt im Wagen.
+2026-09-25 18:23:22 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'roter_wagen_kinder_1234_pink_hut'
+2026-09-25 18:23:22 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_roter_wagen_kinder_1234_pink_hut.jpg
+2026-09-25 18:23:25 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51243.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:23:25 - filemind.routing.router - INFO - Klassifizierung: 51243.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 18:23:26 - filemind.integrations.ocr - INFO - OCR erfolgreich für '51243.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:23:26 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 51243.jpg (Typ: real_image)
+2026-09-25 18:36:13 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 51243.jpg: Eine Frau und ein Kind sitzen auf einem hölzernen Sattel im Garten vor einer weißen Wand mit einem Fenster.
+2026-09-25 18:36:27 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'frau_kinder_sattel_garten_wand'
+2026-09-25 18:36:27 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-09_frau_kinder_sattel_garten_wand.jpg
+2026-09-25 18:36:29 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4324.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:36:29 - filemind.routing.router - INFO - Klassifizierung: 4324.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 18:36:30 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4324.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:36:30 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4324.jpg (Typ: real_image)
+2026-09-25 18:49:51 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4324.jpg: Ein junges Baby mit einem rosa Flecken auf der Stirn liegt auf einer Decke und blickt direkt in die Kamera.
+2026-09-25 18:50:05 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_rosa_stirn'
+2026-09-25 18:50:05 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_rosa_stirn.jpg
+2026-09-25 18:50:07 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4769.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:50:07 - filemind.routing.router - INFO - Klassifizierung: 4769.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 18:50:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4769.jpg' - erkannter Text-Länge: 0
+2026-09-25 18:50:08 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4769.jpg (Typ: real_image)
+2026-09-25 19:03:29 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4769.jpg: Ein kleines Baby mit großen Augen und rosa Kleidung, das direkt in die Kamera blickt.
+2026-09-25 19:03:43 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_baby_rosa_augen_zu_kamera'
+2026-09-25 19:03:43 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kleine_baby_rosa_augen_zu_kamera.jpg
+2026-09-25 19:03:48 - filemind.integrations.ocr - INFO - OCR erfolgreich für '8064.jpg' - erkannter Text-Länge: 11
+2026-09-25 19:03:48 - filemind.routing.router - INFO - Klassifizierung: 8064.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 19:03:51 - filemind.integrations.ocr - INFO - OCR erfolgreich für '8064.jpg' - erkannter Text-Länge: 11
+2026-09-25 19:03:51 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 8064.jpg (Typ: real_image)
+2026-09-25 19:16:38 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 8064.jpg: Ein kleines Kind liegt auf einem grauen Kuschelbett und hält eine grüne Spielzeugfigur sowie ein Buch mit Tieren in den Händen.
+2026-09-25 19:16:53 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'klein_kuschelbett_gruenes_buch_tiere'
+2026-09-25 19:16:53 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_klein_kuschelbett_gruenes_buch_tiere.jpg
+2026-09-25 19:16:55 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4949.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:16:55 - filemind.routing.router - INFO - Klassifizierung: 4949.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 19:16:56 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4949.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:16:56 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4949.jpg (Typ: real_image)
+2026-09-25 19:30:18 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4949.jpg: Eine kleine Mädchen mit roten Haaren sitzt an einem Tisch und hält eine leuchtend rosa Kunststoffhaarstrang in der Hand.
+2026-09-25 19:30:33 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'rothaar_maedchen_haarstrang'
+2026-09-25 19:30:33 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_rothaar_maedchen_haarstrang.jpg
+2026-09-25 19:30:35 - filemind.integrations.ocr - INFO - OCR erfolgreich für '40448.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:30:35 - filemind.routing.router - INFO - Klassifizierung: 40448.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 19:30:37 - filemind.integrations.ocr - INFO - OCR erfolgreich für '40448.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:30:37 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 40448.jpg (Typ: real_image)
+2026-09-25 19:43:24 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 40448.jpg: Ein kleines Mädchen mit zwei Haarschleifen sitzt an einem Tisch und isst etwas.
+2026-09-25 19:43:38 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kleine_haarschleifen_maedchen_tisch_isst'
+2026-09-25 19:43:38 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-02-27_kleine_haarschleifen_maedchen_tisch_isst.jpg
+2026-09-25 19:43:40 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4790.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:43:40 - filemind.routing.router - INFO - Klassifizierung: 4790.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 19:43:41 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4790.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:43:41 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4790.jpg (Typ: real_image)
+2026-09-25 19:57:05 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4790.jpg: Ein Baby liegt in einem Kinderbett und spielt mit einer bunten Spielzeugfigur.
+2026-09-25 19:57:08 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'kinderbett_baby_spielzeug'
+2026-09-25 19:57:08 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_kinderbett_baby_spielzeug.jpg
+2026-09-25 19:57:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49125.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:57:09 - filemind.routing.router - INFO - Klassifizierung: 49125.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 19:57:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '49125.jpg' - erkannter Text-Länge: 0
+2026-09-25 19:57:09 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 49125.jpg (Typ: real_image)
+2026-09-25 20:11:24 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 49125.jpg: Eine junge Frau mit einer roten Kappe und einem T-Shirt steht auf einer Treppe im Park und zeigt mit dem Arm eine große, farbenfrohe Papagei, die auf ihrem Arm sitzt, während ein Mann in braunen Kleidern daneben steht und ebenfalls einen Papagei hält.
+2026-09-25 20:12:49 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'papagei_park_treppe_wei_beta'
+2026-09-25 20:12:50 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-29_papagei_park_treppe_wei_beta.jpg
+2026-09-25 20:13:06 - filemind.integrations.ocr - INFO - OCR erfolgreich für '11984.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:13:06 - filemind.routing.router - INFO - Klassifizierung: 11984.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 20:13:08 - filemind.integrations.ocr - INFO - OCR erfolgreich für '11984.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:13:08 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 11984.jpg (Typ: real_image)
+2026-09-25 20:26:05 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 11984.jpg: Zwei Kinder umarmen sich liebevoll im warmen Licht eines Kuschelgefühls, wobei eine der beiden Mädchen mit einem lebhaften Lächeln in die Kamera blickt und die andere teilweise von einer flauschigen Decke bedeckt ist.
+2026-09-25 20:27:28 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'zwei_kinder_umarmen_sich'
+2026-09-25 20:27:28 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-01-17_zwei_kinder_umarmen_sich.jpg
+2026-09-25 20:27:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4673.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:27:42 - filemind.routing.router - INFO - Klassifizierung: 4673.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 20:27:43 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4673.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:27:43 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4673.jpg (Typ: real_image)
+2026-09-25 20:41:10 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4673.jpg: Ein schlafendes Baby in einem roten Kinderwagen mit einer beige Kapuzenjacke und Spielzeug im Bereich des Kindersitzes.
+2026-09-25 20:42:06 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schlafendes_baby_roter_wagen_kapuze_spielzeug'
+2026-09-25 20:42:06 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schlafendes_baby_roter_wagen_kapuze_spielzeug.jpg
+2026-09-25 20:42:20 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4918.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:42:20 - filemind.routing.router - INFO - Klassifizierung: 4918.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 20:42:21 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4918.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:42:21 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4918.jpg (Typ: real_image)
+2026-09-25 20:57:21 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900.0)
+2026-09-25 20:57:21 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_4918'
+2026-09-25 20:57:21 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_foto_4918.jpg
+2026-09-25 20:57:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50128.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:57:36 - filemind.routing.router - INFO - Klassifizierung: 50128.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 20:57:38 - filemind.integrations.ocr - INFO - OCR erfolgreich für '50128.jpg' - erkannter Text-Länge: 0
+2026-09-25 20:57:38 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 50128.jpg (Typ: real_image)
+2026-09-25 21:12:09 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 50128.jpg: Eine Familie mit zwei Kindern steht vor dem markanten, kuppelartigen Gebäude der Glasgow International Festival Hall im Freien.
+2026-09-25 21:13:17 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'familie_kinder_glasgow_halle_1234'
+2026-09-25 21:13:17 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-06-05_familie_kinder_glasgow_halle_1234.jpg
+2026-09-25 21:13:36 - filemind.integrations.ocr - INFO - OCR erfolgreich für '40469.jpg' - erkannter Text-Länge: 443
+2026-09-25 21:13:36 - filemind.classification.classifier - INFO - 40469.jpg: viel Text (61 Wörter), aber farbig (Farbwert=28.2 > 18.0) -> als Foto behandelt
+2026-09-25 21:13:36 - filemind.routing.router - INFO - Klassifizierung: 40469.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 21:13:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '40469.jpg' - erkannter Text-Länge: 443
+2026-09-25 21:13:42 - filemind.classification.classifier - INFO - 40469.jpg: viel Text (61 Wörter), aber farbig (Farbwert=28.2 > 18.0) -> als Foto behandelt
+2026-09-25 21:13:42 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 40469.jpg (Typ: real_image)
+2026-09-25 21:28:42 - filemind.integrations.ai_naming.ollama - WARNING - Ollama-Request fehlgeschlagen (http://localhost:11434/api/generate): HTTPConnectionPool(host='localhost', port=11434): Read timed out. (read timeout=900.0)
+2026-09-25 21:28:42 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'foto_40469'
+2026-09-25 21:28:42 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-02-27_foto_40469.jpg
+2026-09-25 21:28:56 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4437.jpg' - erkannter Text-Länge: 0
+2026-09-25 21:28:56 - filemind.routing.router - INFO - Klassifizierung: 4437.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 21:28:57 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4437.jpg' - erkannter Text-Länge: 0
+2026-09-25 21:28:57 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4437.jpg (Typ: real_image)
+2026-09-25 21:43:33 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4437.jpg: Ein Mann mit Brille hält eine kleine Babys auf einem Tisch in einer Küche.
+2026-09-25 21:44:03 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'mann_babys_kueche'
+2026-09-25 21:44:03 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_mann_babys_kueche.jpg
+2026-09-25 21:44:16 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4279.jpg' - erkannter Text-Länge: 0
+2026-09-25 21:44:16 - filemind.routing.router - INFO - Klassifizierung: 4279.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 21:44:17 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4279.jpg' - erkannter Text-Länge: 0
+2026-09-25 21:44:17 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4279.jpg (Typ: real_image)
+2026-09-25 21:59:03 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4279.jpg: Ein Mann mit Brille hält eine kleine Babyin der Armläufe und lächelt.
+2026-09-25 21:59:57 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'brille_baby_armlauffamilie_laechelnd'
+2026-09-25 21:59:57 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_brille_baby_armlauffamilie_laechelnd.jpg
+2026-09-25 22:00:30 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4226.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:00:30 - filemind.routing.router - INFO - Klassifizierung: 4226.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 22:00:33 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4226.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:00:33 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4226.jpg (Typ: real_image)
+2026-09-25 22:06:34 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4226.jpg: Eine Person mit Brille hält einen gestreiften Katzenkopf auf dem Arm und schaut ihn an.
+2026-09-25 22:06:55 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'brille_katze_streifen_ohren'
+2026-09-25 22:06:55 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_brille_katze_streifen_ohren.jpg
+2026-09-25 22:07:09 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4772.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:07:09 - filemind.routing.router - INFO - Klassifizierung: 4772.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 22:07:10 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4772.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:07:10 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4772.jpg (Typ: real_image)
+2026-09-25 22:20:31 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4772.jpg: Ein Baby mit großen Augen und rosa Kleidung liegt auf dem Boden und blickt direkt in die Kamera.
+2026-09-25 22:20:45 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_auge_rosa_liegt'
+2026-09-25 22:20:45 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_auge_rosa_liegt.jpg
+2026-09-25 22:21:01 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44826.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:21:01 - filemind.routing.router - INFO - Klassifizierung: 44826.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 22:21:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '44826.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:21:03 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 44826.jpg (Typ: real_image)
+2026-09-25 22:33:48 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 44826.jpg: Ein kleiner, weißer Insektenschutz ist auf einer dunklen Oberfläche in einem Aquarium zu sehen.
+2026-09-25 22:34:02 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'weiss_insektenschutz_aquarium'
+2026-09-25 22:34:02 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_weiss_insektenschutz_aquarium.jpg
+2026-09-25 22:34:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4965.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:34:03 - filemind.routing.router - INFO - Klassifizierung: 4965.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 22:34:03 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4965.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:34:03 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4965.jpg (Typ: real_image)
+2026-09-25 22:47:26 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4965.jpg: Ein Baby liegt auf einem farbenfrohen Spielmatte und spielt mit einer Spielbar am Rand des Raumes.
+2026-09-25 22:47:41 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'baby_spielzeug_farben_zauber_matte'
+2026-09-25 22:47:41 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_baby_spielzeug_farben_zauber_matte.jpg
+2026-09-25 22:47:45 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45615.jpg' - erkannter Text-Länge: 718
+2026-09-25 22:47:45 - filemind.routing.router - INFO - Klassifizierung: 45615.jpg -> document_image (Vertrauen: 0.75)
+2026-09-25 22:47:45 - filemind.routing.router - INFO - Führe OCR durch: 45615.jpg
+2026-09-25 22:47:49 - filemind.integrations.ocr - INFO - OCR erfolgreich für '45615.jpg' - erkannter Text-Länge: 718
+2026-09-25 22:47:49 - filemind.routing.router - INFO - OCR erfolgreich: 718 Zeichen extrahiert
+2026-09-25 22:47:50 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4275.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:47:50 - filemind.routing.router - INFO - Klassifizierung: 4275.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 22:47:51 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4275.jpg' - erkannter Text-Länge: 0
+2026-09-25 22:47:51 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4275.jpg (Typ: real_image)
+2026-09-25 23:01:18 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 4275.jpg: Ein schlafendes Baby liegt auf einem Kissen mit Sternenmuster und einer Stethoskop-Schlauch, die über der Schulter liegt.
+2026-09-25 23:01:34 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'schlafender_kinder_stethoskop_sternkissen'
+2026-09-25 23:01:34 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_schlafender_kinder_stethoskop_sternkissen.jpg
+2026-09-25 23:01:48 - filemind.integrations.ocr - INFO - OCR erfolgreich für '10432.jpg' - erkannter Text-Länge: 439
+2026-09-25 23:01:48 - filemind.classification.classifier - INFO - 10432.jpg: viel Text (83 Wörter), aber farbig (Farbwert=131.5 > 18.0) -> als Foto behandelt
+2026-09-25 23:01:48 - filemind.routing.router - INFO - Klassifizierung: 10432.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 23:01:58 - filemind.integrations.ocr - INFO - OCR erfolgreich für '10432.jpg' - erkannter Text-Länge: 439
+2026-09-25 23:01:58 - filemind.classification.classifier - INFO - 10432.jpg: viel Text (83 Wörter), aber farbig (Farbwert=131.5 > 18.0) -> als Foto behandelt
+2026-09-25 23:01:58 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 10432.jpg (Typ: real_image)
+2026-09-25 23:14:50 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 10432.jpg: Das Bild zeigt eine Weihnachtsaktion der Aldi Süd mit einem Werbeplakat für den "Weihnachtshelfer", das von 4.12. bis 09.12. gültig ist und verschiedene Produkte wie Lichterketten, Dekorationen und Batterien anbietet.
+2026-09-25 23:16:16 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'weihnachtsaktion_aldi_sued_weihnachtshelfer_2023_12_04_09_12'
+2026-09-25 23:16:16 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_weihnachtsaktion_aldi_sued_weihnachtshelfer_2023_12_04_09_12.jpg
+2026-09-25 23:16:20 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43539.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:16:20 - filemind.routing.router - INFO - Klassifizierung: 43539.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 23:16:23 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43539.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:16:23 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 43539.jpg (Typ: real_image)
+2026-09-25 23:29:10 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 43539.jpg: Die Hauptfigur des Fotos ist eine grüne Wiese, die sich vor einem bewaldeten Hügel erstreckt und von einer asphaltierten Straße begrenzt wird.
+2026-09-25 23:29:26 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'gruen_wiese_huegel_straesse'
+2026-09-25 23:29:26 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_gruen_wiese_huegel_straesse.jpg
+2026-09-25 23:29:33 - filemind.integrations.ocr - INFO - OCR erfolgreich für '19978.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:29:33 - filemind.routing.router - INFO - Klassifizierung: 19978.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 23:29:39 - filemind.integrations.ocr - INFO - OCR erfolgreich für '19978.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:29:39 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 19978.jpg (Typ: real_image)
+2026-09-25 23:42:25 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 19978.jpg: Ein Tier ist im Garten bei Nacht zu sehen, das sich unter einem Baum befindet und von einer Lichtquelle beleuchtet wird.
+2026-09-25 23:42:40 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'tier_baum_nacht_licht'
+2026-09-25 23:42:40 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-05-01_tier_baum_nacht_licht.jpg
+2026-09-25 23:42:42 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43459.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:42:42 - filemind.routing.router - INFO - Klassifizierung: 43459.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 23:42:43 - filemind.integrations.ocr - INFO - OCR erfolgreich für '43459.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:42:43 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 43459.jpg (Typ: real_image)
+2026-09-25 23:55:29 - filemind.integrations.ai_naming.ollama - INFO - Bildbeschreibung für 43459.jpg: Eine junge Mädchen mit roten Haaren und einer schwarzen Kleidung steht in einem Kinderzimmer vor einem weißen Schrank und einem Bett.
+2026-09-25 23:55:44 - filemind.routing.router - INFO - Rohes Smart-Name-Ergebnis: 'maedchen_rote_haar_schwarz_kleidung_kinderzimmer'
+2026-09-25 23:55:44 - filemind.routing.router - INFO - AI-Naming schlägt vor: 2026-04-05_maedchen_rote_haar_schwarz_kleidung_kinderzimmer.jpg
+2026-09-25 23:55:46 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4388.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:55:46 - filemind.routing.router - INFO - Klassifizierung: 4388.jpg -> real_image (Vertrauen: 0.90)
+2026-09-25 23:55:47 - filemind.integrations.ocr - INFO - OCR erfolgreich für '4388.jpg' - erkannter Text-Länge: 0
+2026-09-25 23:55:47 - filemind.integrations.ai_naming - INFO - Generiere Namen für: 4388.jpg (Typ: real_image)

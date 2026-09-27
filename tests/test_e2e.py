@@ -62,6 +62,7 @@ def _fake_ollama(monkeypatch: pytest.MonkeyPatch):
         images: Optional[List[str]] = None,
         num_predict: int = 128,
         temperature: float = 0.2,
+        purpose: str = "generation",
     ) -> str:
         if images:
             return "A brown dog playing in a park."

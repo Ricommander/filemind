@@ -7,6 +7,7 @@ from filemind.config import (
     get_config_file,
     get_language,
     get_section,
+    load_config,
     reload_config,
     set_config_file,
 )
@@ -40,6 +41,12 @@ daemon:
     }
     assert get_section("daemon") == {"poll_interval": 123}
     assert get_section("missing", {"default": True}) == {"default": True}
+
+
+def test_project_config_includes_nef_as_image_extension() -> None:
+    config_path = Path(__file__).parents[1] / "config.yaml"
+
+    assert ".nef" in load_config(config_path)["classification"]["image_extensions"]
 
 
 def test_reload_config_updates_cached_values(tmp_path: Path) -> None:

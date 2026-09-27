@@ -14,14 +14,19 @@ Funktionalität:
 
 from __future__ import annotations
 
+import json
 import logging
+import math
+import shutil
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from filemind.classification.classifier import classify_file
-from filemind.config import get_language
+from filemind.config import get_language, get_section
 from filemind.core.models import FileType
+from filemind.performance import measure
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +51,10 @@ def _reverse_geocode(lat: float, lon: float) -> Optional[Dict[str, str]]:
         return None
 
     try:
-        geolocator = Nominatim(user_agent="filemind")
-        loc = geolocator.reverse((lat, lon), language=get_language(), timeout=10)
+        with measure("metadata.reverse_geocode") as measurement:
+            geolocator = Nominatim(user_agent="filemind")
+            loc = geolocator.reverse((lat, lon), language=get_language(), timeout=10)
+            measurement["resolved"] = loc is not None
         if not loc:
             return None
         adr = loc.raw.get("address", {})
@@ -60,29 +67,55 @@ def _reverse_geocode(lat: float, lon: float) -> Optional[Dict[str, str]]:
         return None
 
 
-def get_country_city_from_file(path: Path) -> Optional[Dict[str, Optional[str]]]:
-    """Extrahiert GPS aus Datei und führt Reverse-Geocoding aus.
+def get_country_city_from_file(
+    path: Path, allow_ai_fallback: bool = True
+) -> Optional[Dict[str, Any]]:
+    """Ermittelt den Ort aus Metadaten oder, wenn GPS fehlt, aus dem Bild.
 
-    Returns: {"country": str|None, "city": str|None} oder None.
+    Koordinaten aus unterstützten Metadatenquellen haben Vorrang und werden
+    reverse-geocodiert. Ohne Koordinaten darf das Vision-Modell Land und Stadt
+    unabhängig voneinander nur ab 95 % Konfidenz übernehmen.
     """
     try:
+        classification = get_section("classification", {}) or {}
+        configured_extensions = classification.get("image_extensions", [])
+        if configured_extensions:
+            image_extensions = {
+                str(extension).strip().lstrip(".").casefold()
+                for extension in configured_extensions
+                if str(extension).strip()
+            }
+        else:
+            image_extensions = {
+                "jpg", "jpeg", "png", "webp", "bmp", "tiff", "tif",
+                "heic", "heif", "gif", "nef",
+            }
+        if path.suffix.lstrip(".").casefold() not in image_extensions:
+            return None
+
         gps = _extract_gps_from_image(path)
-        if not gps:
+        if gps:
+            lat = gps.get("lat")
+            lon = gps.get("lon")
+            if lat is None or lon is None:
+                return None
+            location = _reverse_geocode(lat, lon)
+            if location:
+                return location
+            # Bei vorhandenen Koordinaten bleibt Geocoding die maßgebliche Quelle.
+            logger.debug(
+                f"Reverse-Geocoding lieferte kein Ergebnis für {path}; Datei wird ohne "
+                f"Land/Stadt-Struktur abgelegt"
+            )
             return None
-        lat = gps.get("lat")
-        lon = gps.get("lon")
-        if lat is None or lon is None:
+
+        ai_config = get_section("ai", {}) or {}
+        if not allow_ai_fallback or not ai_config.get("enabled", False):
             return None
-        location = _reverse_geocode(lat, lon)
-        if location:
-            return location
-        # Kein Geocoding-Ergebnis: keine Orts-Ordner erzeugen. Ein Fallback auf
-        # rohe GPS-Koordinaten würde Ordner wie "gps/52.745078_9.616632" anlegen.
-        logger.debug(
-            f"Reverse-Geocoding lieferte kein Ergebnis für {path}; Datei wird ohne "
-            f"Land/Stadt-Struktur abgelegt"
-        )
-        return None
+
+        from filemind.integrations.ai_naming import infer_image_location
+
+        return infer_image_location(path)
     except Exception as e:
         logger.debug(f"Konnte Country/City nicht ermitteln für {path}: {e}")
         return None
@@ -399,11 +432,83 @@ def _dms_to_decimal(dms, ref: str) -> float:
 
 
 def _extract_gps_from_image(path: Path) -> Optional[Dict[str, float]]:
-    """Versucht, GPS-Koordinaten aus dem EXIF-Block eines Bildes zu lesen.
+    """Liest GPS aus unterstützten Metadatenquellen, einschließlich XMP und RAW.
 
-    Verwendet Pillow falls vorhanden; bei fehlendem Paket wird None zurückgegeben
-    und eine Warnung geloggt.
+    Pillow bleibt als Fallback verfügbar, falls ExifTool nicht installiert ist.
     """
+    if shutil.which("exiftool"):
+        return _gps_from_metadata(_read_exiftool_metadata(path))
+    return _extract_exif_gps_with_pillow(path)
+
+
+def _read_exiftool_metadata(path: Path) -> list[Dict[str, Any]]:
+    """Liest alle verfügbaren Metadaten, ohne Werte davon zu protokollieren."""
+    executable = shutil.which("exiftool")
+    if not executable:
+        logger.debug("ExifTool nicht verfügbar; nutze den Pillow-EXIF-Fallback")
+        return []
+
+    try:
+        with measure("metadata.exiftool") as measurement:
+            result = subprocess.run(
+                [executable, "-json", "-n", "-G1", "-a", "-api", "RequestAll=3", str(path)],
+                capture_output=True,
+                check=True,
+                text=True,
+                timeout=30,
+            )
+            payload = json.loads(result.stdout)
+        if isinstance(payload, list):
+            records = [item for item in payload if isinstance(item, dict)]
+            measurement["metadata_tag_count"] = sum(len(record) for record in records)
+            return records
+    except Exception as e:
+        logger.debug(f"ExifTool-Metadaten konnten nicht gelesen werden für {path}: {e}")
+    return []
+
+
+def _gps_from_metadata(metadata: list[Dict[str, Any]]) -> Optional[Dict[str, float]]:
+    """Findet gültige GPS-Paare gruppenweise, damit Tags nicht vermischt werden."""
+    groups: Dict[str, Dict[str, Any]] = {}
+    for record in metadata:
+        for key, value in record.items():
+            group, _, tag = key.rpartition(":")
+            normalized_tag = "".join(char for char in tag.casefold() if char.isalnum())
+            if normalized_tag.startswith("gps"):
+                groups.setdefault(group, {})[normalized_tag] = value
+
+    # Quelldaten haben Vorrang vor Composite-Tags, die ExifTool daraus ableitet.
+    ordered_groups = sorted(groups, key=lambda group: group.casefold().startswith("composite"))
+    for group in ordered_groups:
+        values = groups[group]
+        lat = _coordinate_value(values.get("gpslatitude"))
+        lon = _coordinate_value(values.get("gpslongitude"))
+        if lat is None or lon is None:
+            continue
+
+        lat = _apply_coordinate_ref(lat, values.get("gpslatituderef"), negative_ref="s")
+        lon = _apply_coordinate_ref(lon, values.get("gpslongituderef"), negative_ref="w")
+        if -90 <= lat <= 90 and -180 <= lon <= 180:
+            return {"lat": lat, "lon": lon}
+    return None
+
+
+def _coordinate_value(value: Any) -> Optional[float]:
+    try:
+        coordinate = float(value)
+        return coordinate if math.isfinite(coordinate) else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _apply_coordinate_ref(value: float, reference: Any, negative_ref: str) -> float:
+    if isinstance(reference, str) and reference.casefold() in ("n", "s", "e", "w"):
+        return -abs(value) if reference.casefold() == negative_ref else abs(value)
+    return value
+
+
+def _extract_exif_gps_with_pillow(path: Path) -> Optional[Dict[str, float]]:
+    """Liest EXIF-GPS mit Pillow, wenn ExifTool nicht verfügbar ist."""
     try:
         from PIL import Image
         from PIL.ExifTags import GPSTAGS, TAGS
@@ -412,18 +517,34 @@ def _extract_gps_from_image(path: Path) -> Optional[Dict[str, float]]:
         return None
 
     try:
-        img = Image.open(path)
-        exif = img._getexif()
-        if not exif:
+        with Image.open(path) as img:
+            exif_reader = getattr(img, "getexif", None)
+            exif = exif_reader() if callable(exif_reader) else None
+            gps_values = None
+            if exif:
+                get_ifd = getattr(exif, "get_ifd", None)
+                if callable(get_ifd):
+                    try:
+                        gps_values = get_ifd(34853)
+                    except Exception:
+                        gps_values = None
+                for tag, value in exif.items():
+                    if TAGS.get(tag, tag) == "GPSInfo" and isinstance(value, dict):
+                        gps_values = value
+
+            if not gps_values:
+                legacy_reader = getattr(img, "_getexif", None)
+                legacy_exif = legacy_reader() if callable(legacy_reader) else None
+                if legacy_exif:
+                    for tag, value in legacy_exif.items():
+                        if TAGS.get(tag, tag) == "GPSInfo" and isinstance(value, dict):
+                            gps_values = value
+                            break
+
+        if not gps_values:
             return None
 
-        gps_info = {}
-        for tag, value in exif.items():
-            decoded = TAGS.get(tag, tag)
-            if decoded == "GPSInfo":
-                for t in value:
-                    sub_decoded = GPSTAGS.get(t, t)
-                    gps_info[sub_decoded] = value[t]
+        gps_info = {GPSTAGS.get(tag, tag): value for tag, value in gps_values.items()}
 
         if not gps_info:
             return None
@@ -438,7 +559,9 @@ def _extract_gps_from_image(path: Path) -> Optional[Dict[str, float]]:
         if lat is None or lon is None:
             return None
 
-        return {"lat": lat, "lon": lon}
+        if -90 <= lat <= 90 and -180 <= lon <= 180:
+            return {"lat": lat, "lon": lon}
+        return None
 
     except Exception as e:
         logger.warning(f"Fehler beim Auslesen von EXIF/GPS aus {path}: {e}")

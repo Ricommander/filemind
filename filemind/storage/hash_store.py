@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from filemind.logging_utils.logger import get_logger
+from filemind.performance import file_context, measure
 
 logger = get_logger(__name__)
 
@@ -151,14 +152,16 @@ class HashStore:
 
         try:
             sha256_hash = hashlib.sha256()
+            file_size = path.stat().st_size
 
             # Lese Datei in Chunks
-            with open(path, "rb") as f:
-                for chunk in iter(lambda: f.read(BUFFER_SIZE), b""):
-                    sha256_hash.update(chunk)
+            with file_context(path):
+                with measure("hash.sha256", bytes_processed=file_size):
+                    with open(path, "rb") as f:
+                        for chunk in iter(lambda: f.read(BUFFER_SIZE), b""):
+                            sha256_hash.update(chunk)
 
             hash_value = sha256_hash.hexdigest()
-            file_size = path.stat().st_size
 
             logger.debug(
                 f"Hash berechnet für {path.name}: {hash_value[:16]}... "
@@ -206,12 +209,13 @@ class HashStore:
             conn = self._get_connection()
             cursor = conn.cursor()
 
-            cursor.execute(
-                "SELECT COUNT(*) FROM file_hashes WHERE file_hash = ?",
-                (file_hash,),
-            )
+            with measure("hash.duplicate_lookup"):
+                cursor.execute(
+                    "SELECT COUNT(*) FROM file_hashes WHERE file_hash = ?",
+                    (file_hash,),
+                )
 
-            result = cursor.fetchone()
+                result = cursor.fetchone()
             is_dup = result[0] > 0 if result else False
 
             if is_dup:
@@ -256,16 +260,16 @@ class HashStore:
             cursor = conn.cursor()
 
             # Versuche Einfügung
-            cursor.execute(
-                """
+            with measure("hash.index_write", bytes_processed=file_size):
+                cursor.execute(
+                    """
 				INSERT OR REPLACE INTO file_hashes
 				(file_path, file_hash, file_size, last_checked)
 				VALUES (?, ?, ?, CURRENT_TIMESTAMP)
 				""",
-                (str(path), file_hash, file_size),
-            )
-
-            conn.commit()
+                    (str(path), file_hash, file_size),
+                )
+                conn.commit()
 
             # Aktualisiere Cache
             with self._cache_lock:
@@ -320,6 +324,54 @@ class HashStore:
         except Exception as e:
             logger.debug(f"Fehler bei is_registered_unchanged für {path}: {e}")
             return False
+
+    def is_registered_unchanged_many(self, paths: List[Path]) -> set[str]:
+        """Prüft Datei-Pfade gebündelt gegen den Index und liefert unveränderte Pfade."""
+        unchanged: set[str] = set()
+        if not paths:
+            return unchanged
+
+        registered_sizes: Dict[str, int] = {}
+        try:
+            cursor = self._get_connection().cursor()
+        except Exception as e:
+            logger.debug(f"Hash-Index-Verbindung für Batch-Lookup fehlgeschlagen: {e}")
+            return unchanged
+        batch_size = 500
+
+        for offset in range(0, len(paths), batch_size):
+            batch = paths[offset : offset + batch_size]
+            placeholders = ",".join("?" for _ in batch)
+            try:
+                with measure("hash.registered_unchanged_batch", files=len(batch)):
+                    cursor.execute(
+                        f"SELECT file_path, file_size FROM file_hashes "
+                        f"WHERE file_path IN ({placeholders})",
+                        [str(path) for path in batch],
+                    )
+                    registered_sizes.update(cursor.fetchall())
+            except Exception as e:
+                logger.debug(f"Gebündelter Hash-Index-Lookup fehlgeschlagen: {e}")
+                continue
+
+        for path in paths:
+            try:
+                if registered_sizes.get(str(path)) == path.stat().st_size:
+                    unchanged.add(str(path))
+            except OSError:
+                continue
+
+        return unchanged
+
+    def get_registered_sizes(self) -> Dict[str, int]:
+        """Liefert die zuletzt registrierten Dateigrößen in einer Abfrage."""
+        try:
+            cursor = self._get_connection().cursor()
+            cursor.execute("SELECT file_path, file_size FROM file_hashes")
+            return {row[0]: row[1] for row in cursor.fetchall()}
+        except Exception as e:
+            logger.debug(f"Registrierte Dateigrößen konnten nicht gelesen werden: {e}")
+            return {}
 
     def get_hash_by_path(self, path: Path) -> Optional[str]:
         """Ruft den Hash einer registrierten Datei ab.
@@ -585,6 +637,16 @@ def is_registered_unchanged(path: Path) -> bool:
             True, falls der Pfad mit unveränderter Größe registriert ist.
     """
     return get_hash_store().is_registered_unchanged(path)
+
+
+def is_registered_unchanged_many(paths: List[Path]) -> set[str]:
+    """Prüft mehrere registrierte Dateien mit begrenzten SQLite-Abfragen."""
+    return get_hash_store().is_registered_unchanged_many(paths)
+
+
+def get_registered_sizes() -> Dict[str, int]:
+    """Liefert die zuletzt registrierten Dateigrößen des Hash-Index."""
+    return get_hash_store().get_registered_sizes()
 
 
 def find_paths_by_hash(file_hash: str) -> List[str]:

@@ -2,37 +2,13 @@
 
 A modern daemon-based file organization system that automatically classifies, processes, and organizes files based on their content and type.
 
-## Features
+## Requirements
 
-- 🤖 **Intelligent Classification**: Automatically detects file types (images, documents, videos, audio, archives)
-- 📄 **OCR Support**: Extract text from document images
-- 🔍 **Binary Deduplication**: Detect and prevent duplicate files using SHA-256 hashing
-- 🏷️ **Smart Naming**: AI-powered file naming (first describes the image, then finds the best name based on the description of the image)
-- 📁 **Organized Storage**: Year-based directory structures (YYYY\Country\City format, max 3000 files directly per folder - subfolders don't count; full folders overflow to YYYY_1, YYYY_2, ...)
-- 🧵 **Thread-Safe**: Concurrent processing with proper locking mechanisms
-- 📊 **Comprehensive Logging**: Rotating file handlers with configurable retention
-- **GPS reverse geocoding**: Finds the correct country and city of an image if GPS coordinates are present in the metadata.
-- 🌍 **Configurable language**: Generated file and folder names in German or English (`language: "de"` or `"en"`, e.g. "Deutschland" vs. "Germany").
+The authoritative product and operational requirements are maintained separately in [REQUIREMENTS.md](REQUIREMENTS.md). This README is the guide for installation, configuration, and use.
 
 ## Architecture
 
-```
-Input Directory
-    ↓
-[1] File Monitoring (Daemon/Polling)
-    ↓
-[2] Classification (File Type Detection)
-    ↓
-[3] Deduplication Check (SHA-256 Hash)
-    ↓
-[4] Type-Specific Processing
-    ├─ Documents → OCR → Paperless NGX
-    ├─ Images → Smart Naming → Storage
-    ├─ Videos/Audio/Archives → Metadata Extraction → Storage
-    └─ Others → Storage
-    ↓
-[5] Organized Output (YYYY\Country\City folders)
-```
+The required processing flow and integrations are defined in [REQUIREMENTS.md](REQUIREMENTS.md).
 
 ## Installation
 
@@ -88,7 +64,6 @@ Useful commands:
 ```bash
 journalctl -u filemind -f          # follow logs
 systemctl status filemind          # service status
-systemctl restart filemind         # restart after config changes
 ```
 
 The unit file lives in [deploy/filemind.service](deploy/filemind.service).
@@ -115,6 +90,12 @@ logging:
   console_enabled: true                # Print to console
   console_level: "WARNING"             # Only print warnings and errors to console
 
+# Performance Diagnostics
+performance:
+  enabled: true                        # Write machine-readable stage metrics
+  max_log_mb: 10                       # Rotate performance.jsonl at this size
+  backup_count: 3                      # Number of rotated performance logs to keep
+
 # Daemon Configuration
 daemon:
   input_directories:                   # Directories to watch for new files
@@ -123,6 +104,7 @@ daemon:
     - path: "/media/storage_main/altes_backup"
       action: "move"
   poll_interval: 3600                  # Check for new files every 3600 seconds (1 hour)
+  reprocess_processed: false           # Reprocess files already stored in the destination directories once at startup
 
 # Storage Configuration
 storage:
@@ -154,6 +136,7 @@ classification:
     - ".webp"
     - ".tiff"
     - ".heic"
+    - ".nef"
 
   # Text document extensions (TEXT_DOCUMENT)
   text_document_extensions:
@@ -162,7 +145,7 @@ classification:
     - ".doc"
     - ".odt"
     - ".xlsx"
-    - ".xls"
+  The script stops `filemind`, uploads the code and local `config.yaml`, updates
     - ".pptx"
     - ".txt"
     - ".rtf"
@@ -172,14 +155,14 @@ classification:
     - ".mp4"
     - ".avi"
     - ".mkv"
-    - ".mov"
-    - ".wmv"
+  Download the active and rotated application logs (`filemind.log*`) and
+  logs (`filemind.log*`) and extract them locally:
     - ".flv"
     - ".webm"
     - ".m4v"
 
   # Audio extensions (AUDIO)
-  audio_extensions:
+  The default remote log directory is `/opt/filemind/.filemind/logs`, based on
     - ".mp3"
     - ".wav"
     - ".flac"
@@ -213,21 +196,42 @@ python -m filemind.main --log-level DEBUG
 
 # With custom input directory
 python -m filemind.main --input-dir /path/to/watch
+
+# Rebuild the persistent duplicate index before starting
+python -m filemind.main --reinit-hash-store
+
+# Reprocess files already stored in the configured destinations once
+### Update a Remote Server and Download Logs
+
+From Windows PowerShell, deploy the current runtime code to the systemd server
+.\deploy\update-server.ps1
 ```
+
+replaces `/etc/filemind/config.yaml` by default; override that path with
+`-RemoteConfigPath` if your service uses another one. The hash database, logs,
+and virtual environment are not uploaded. The script interactively requests the
+sudo password for the SSH account before changing the service; that account
+must be allowed to run sudo commands on the server. Review the local config
+first: its settings, including `reprocess_processed`, become active on the
+server after deployment.
+
+Download the active and rotated application logs (`filemind.log*`) and
+performance logs (`performance.jsonl*`) and extract them locally:
+
+```powershell
+\.\deploy\download-filemind-logs.ps1
+```
+
+The default remote log directory is `/opt/filemind/.filemind/logs`, based on
+the example configuration. If the server's `/etc/filemind/config.yaml` sets a
+different `logging.log_dir`, pass it with `-RemoteLogDirectory`. Both scripts
+use the SSH host alias `fritzleserver` by default and accept `-Server` to select
+another SSH host. Application logs can include file names and paths; review and
+redact them before sharing.
 
 ### File Classification
 
-The system automatically classifies files into these categories:
-
-| Type | Extensions | Behavior  |
-|------|-----------|----------|
-| **Real Image** | jpg, png, gif, etc. | Smart naming, deduplication, organized storage |
-| **Document Image** | PDF (scanned), TIF | OCR (optional), Paperless (optional), storage |
-| **Text Document** | PDF (native), docx, xlsx, txt, etc. | Paperless (optional), storage |
-| **Video** | mp4, mkv, avi, webm, etc. | Metadata extraction, organized storage |
-| **Audio** | mp3, wav, flac, aac, etc. | Metadata extraction, organized storage |
-| **Archives** | zip, rar, 7z, tar, etc. | Metadata extraction, organized storage |
-| **Other** | Everything else | Generic handling, organized storage |
+Required file categories and their handling are specified in [REQUIREMENTS.md](REQUIREMENTS.md). Extension lists are configurable in `config.yaml`.
 
 ### Output Structure
 
@@ -269,25 +273,15 @@ full, storage overflows to the next year suffix folder (`2026` → `2026_1` → 
 
 ### System Modules
 
-- **`logging.logger`**: Thread-safe rotating file logging
-- **`main`**: Daemon entry point and orchestration
-
 ## Logging
-
-Logs are stored in `.filemind/logs/`:
-
-```
 .filemind/logs/
 ├── filemind.log       # Current log file
-├── filemind.log.1     # Yesterday's log
-├── filemind.log.2     # Day before, etc.
-└── ...                # (7 days by default)
 ```
 
 Log format:
-```
-2026-05-25 12:34:56 - filemind.routing.router - INFO - Verarbeitung abgeschlossen: document.pdf
-```
+## Performance Diagnostics
+
+When enabled (the default), filemind writes hardware details and structured stage measurements to `.filemind/logs/performance.jsonl` (or the configured `logging.log_dir`). The file rotates at `performance.max_log_mb`; up to `performance.backup_count` older files are kept. Records include run/file correlation IDs, a sanitized snapshot of effective configuration, wall and process CPU time, and process RSS changes. Paths, filenames, file contents, AI prompts, and secrets are excluded. Long reprocessing passes emit periodic path-free counters and a final summary. Share this JSONL file and its rotations to compare OCR, hashing, AI, metadata, storage, and daemon timings.
 
 ## Development
 
@@ -304,19 +298,12 @@ black filemind/
 pylint filemind/
 ```
 
-### Project Structure
-
-```
 filemind/
-├── __init__.py
 ├── config.yaml                   # Configuration file
 ├── main.py                       # Daemon entry point
-├── classification/
 │   └── classifier.py             # File type classification
 ├── core/
 │   └── models.py                 # Data models
-├── integrations/
-│   ├── ocr.py                    # OCR interface
 │   ├── ai_naming.py              # Smart naming
 │   └── metadata_extractor.py     # Metadata extraction
 ├── logging/
@@ -354,12 +341,9 @@ filemind/
 - **Logging Level**: Set to WARNING in production to reduce I/O
 - **Hash Store**: Uses SQLite with WAL mode for concurrent access
 
-## Security Notes
+## Security
 
-- Store Paperless API token in environment variable or encrypted config
-- Restrict `.filemind/hash_store.db` permissions (contains file hashes)
-- Review classified files before Paperless upload
-- Use HTTPS for Paperless connections in production
+Security requirements for integrations and local data are maintained in [REQUIREMENTS.md](REQUIREMENTS.md).
 
 ## License
 

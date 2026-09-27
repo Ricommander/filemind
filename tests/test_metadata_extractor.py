@@ -18,6 +18,17 @@ from filemind.integrations.metadata_extractor import (
 SAMPLE_IMAGE = Path(__file__).parent / "input" / "20260527_114047.jpg"
 SAMPLE_IMAGE_EXIF_DATE = "2026-05-27"
 
+
+def test_country_city_skips_non_image_extensions(monkeypatch, tmp_path):
+    path = tmp_path / "metadata.py"
+    path.write_text("print('not an image')", encoding="utf-8")
+    monkeypatch.setattr(
+        "filemind.integrations.metadata_extractor._extract_gps_from_image",
+        lambda _: pytest.fail("GPS metadata must not be read for non-images"),
+    )
+
+    assert get_country_city_from_file(path) is None
+
 # Reales Beispielbild OHNE jegliches EXIF-Datum (weitergereichtes Foto). Sein echtes
 # Aufnahmedatum steckt nur im Datei-Zeitstempel - es darf kein Datum erfunden werden.
 NO_EXIF_IMAGE = Path(__file__).parent / "fixtures" / "no_exif_date.jpg"
@@ -407,3 +418,128 @@ def test_get_country_city_returns_none_when_geocoding_fails(monkeypatch, tmp_pat
     )
 
     assert get_country_city_from_file(p) is None
+
+
+def test_extract_gps_reads_grouped_xmp_metadata(monkeypatch, tmp_path):
+    from filemind.integrations import metadata_extractor
+
+    monkeypatch.setattr(metadata_extractor.shutil, "which", lambda name: "exiftool")
+    monkeypatch.setattr(
+        metadata_extractor,
+        "_read_exiftool_metadata",
+        lambda path: [
+            {
+                "XMP-exif:GPSLatitude": 52.745078,
+                "XMP-exif:GPSLatitudeRef": "N",
+                "XMP-exif:GPSLongitude": 9.616632,
+                "XMP-exif:GPSLongitudeRef": "E",
+            }
+        ],
+    )
+
+    assert metadata_extractor._extract_gps_from_image(tmp_path / "photo.jpg") == {
+        "lat": 52.745078,
+        "lon": 9.616632,
+    }
+
+
+def test_pillow_gps_fallback_reads_tiff_exif_ifd_without_legacy_getexif(
+    monkeypatch, tmp_path
+):
+    from filemind.integrations import metadata_extractor
+
+    class TiffExif:
+        def get_ifd(self, ifd):
+            assert ifd == 34853
+            return {
+                1: "N",
+                2: ((52, 1), (45, 1), (0, 1)),
+                3: "W",
+                4: ((9, 1), (36, 1), (0, 1)),
+            }
+
+        def items(self):
+            return []
+
+    class TiffImage:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def getexif(self):
+            return TiffExif()
+
+    monkeypatch.setattr("PIL.Image.open", lambda path: TiffImage())
+
+    assert metadata_extractor._extract_exif_gps_with_pillow(tmp_path / "photo.nef") == {
+        "lat": 52.75,
+        "lon": -9.6,
+    }
+
+
+def test_exiftool_no_gps_does_not_retry_with_pillow(monkeypatch, tmp_path):
+    from filemind.integrations import metadata_extractor
+
+    monkeypatch.setattr(metadata_extractor.shutil, "which", lambda name: "exiftool")
+    monkeypatch.setattr(
+        metadata_extractor,
+        "_read_exiftool_metadata",
+        lambda path: [{"EXIF:Make": "Nikon"}],
+    )
+    monkeypatch.setattr(
+        metadata_extractor,
+        "_extract_exif_gps_with_pillow",
+        lambda path: pytest.fail("Pillow must not retry after ExifTool completed"),
+    )
+
+    assert metadata_extractor._extract_gps_from_image(tmp_path / "photo.nef") is None
+
+
+def test_get_country_city_uses_ai_only_when_gps_is_absent(monkeypatch, tmp_path):
+    from filemind.integrations import metadata_extractor
+
+    image = tmp_path / "photo.jpg"
+    image.write_bytes(b"image")
+    monkeypatch.setattr(metadata_extractor, "_extract_gps_from_image", lambda path: None)
+    monkeypatch.setattr(
+        metadata_extractor,
+        "get_section",
+        lambda name, default=None: {"enabled": True},
+    )
+    monkeypatch.setattr(
+        "filemind.integrations.ai_naming.infer_image_location",
+        lambda path: {
+            "country": "Deutschland",
+            "city": None,
+            "country_confidence": 97.0,
+            "city_confidence": 72.0,
+        },
+    )
+
+    assert get_country_city_from_file(image) == {
+        "country": "Deutschland",
+        "city": None,
+        "country_confidence": 97.0,
+        "city_confidence": 72.0,
+    }
+
+
+def test_get_country_city_can_disable_ai_fallback(monkeypatch, tmp_path):
+    from filemind.integrations import metadata_extractor
+
+    image = tmp_path / "photo.jpg"
+    image.write_bytes(b"image")
+    monkeypatch.setattr(metadata_extractor, "_extract_gps_from_image", lambda path: None)
+    monkeypatch.setattr(
+        metadata_extractor,
+        "get_section",
+        lambda name, default=None: {"enabled": True},
+    )
+    monkeypatch.setattr(
+        "filemind.integrations.ai_naming.infer_image_location",
+        lambda path: pytest.fail("AI location inference must be disabled for non-photos"),
+    )
+
+    assert get_country_city_from_file(image, allow_ai_fallback=False) is None

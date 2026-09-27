@@ -60,6 +60,33 @@ def test_is_registered_unchanged(tmp_path: Path) -> None:
     store.close()
 
 
+def test_is_registered_unchanged_many(tmp_path: Path) -> None:
+    unchanged_path = tmp_path / "unchanged.jpg"
+    changed_path = tmp_path / "changed.jpg"
+    missing_path = tmp_path / "missing.jpg"
+    unchanged_path.write_bytes(b"unchanged")
+    changed_path.write_bytes(b"old content")
+    store = HashStore(db_path=tmp_path / "hash_store.db")
+    store.register_file(unchanged_path)
+    store.register_file(changed_path)
+    changed_path.write_bytes(b"new content with another size")
+
+    assert store.is_registered_unchanged_many(
+        [unchanged_path, changed_path, missing_path]
+    ) == {str(unchanged_path)}
+    store.close()
+
+
+def test_get_registered_sizes_returns_index_snapshot(tmp_path: Path) -> None:
+    file_path = tmp_path / "snapshot.txt"
+    file_path.write_bytes(b"snapshot")
+    store = HashStore(db_path=tmp_path / "hash_store.db")
+    store.register_file(file_path)
+
+    assert store.get_registered_sizes() == {str(file_path): len(b"snapshot")}
+    store.close()
+
+
 def test_delete_hash_removes_entry(tmp_path: Path) -> None:
     content = b"to delete"
     file_path = tmp_path / "delete.txt"

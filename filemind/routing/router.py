@@ -21,6 +21,7 @@ from filemind.classification.classifier import classify_file
 from filemind.config import get_config, get_section
 from filemind.core.models import FileType
 from filemind.logging_utils.logger import get_logger
+from filemind.performance import file_context, measure
 
 logger = get_logger(__name__)
 
@@ -31,6 +32,21 @@ logger = get_logger(__name__)
 # Ändert sich die Datei (mtime/Größe), wird sie erneut geprüft.
 _known_duplicates: Dict[str, Tuple[float, int]] = {}
 _known_duplicates_lock = threading.Lock()
+
+
+def _transfer_file(source: Path, target: Path, action: str) -> None:
+    try:
+        source_size = source.stat().st_size
+    except OSError:
+        source_size = None
+    stage = "storage.copy" if action == "copy" else "storage.move"
+    with measure(stage, bytes_processed=source_size) as measurement:
+        if action == "copy":
+            shutil.copy2(str(source), str(target))
+            measurement["source_retained"] = True
+        else:
+            shutil.move(str(source), str(target))
+            measurement["source_retained"] = False
 
 
 def _file_signature(path: Path) -> Optional[Tuple[float, int]]:
@@ -93,7 +109,9 @@ def _handle_ocr(file_info: "Any") -> Optional[str]:
         path = file_info.path
         logger.info(f"Führe OCR durch: {path.name}")
 
-        text = ocr_to_text(path)
+        with measure("ocr.document_image") as measurement:
+            text = ocr_to_text(path)
+            measurement["characters_detected"] = len(text)
         logger.info(f"OCR erfolgreich: {len(text)} Zeichen extrahiert")
 
         return text
@@ -107,7 +125,7 @@ def _handle_ocr(file_info: "Any") -> Optional[str]:
         return None
 
 
-def _handle_deduplication(file_info: "Any") -> bool:
+def _handle_deduplication(path: Path) -> bool:
     """Prüft auf Duplikate mittels Hash-Vergleich.
 
     Returns: True wenn Duplikat, False wenn neu.
@@ -115,9 +133,11 @@ def _handle_deduplication(file_info: "Any") -> bool:
     try:
         from filemind.storage.hash_store import is_duplicate
 
-        path = file_info.path
+        with measure("hash.duplicate_check") as measurement:
+            duplicate = is_duplicate(path)
+            measurement["duplicate"] = duplicate
 
-        if is_duplicate(path):
+        if duplicate:
             # Einmalig pro Laufzeit melden; Folgedurchläufe des Daemons
             # überspringen die Datei still (siehe _is_known_duplicate).
             logger.warning(
@@ -140,7 +160,11 @@ def _handle_deduplication(file_info: "Any") -> bool:
 
 
 def _handle_storage(
-    file_info: "Any", file_type: FileType, action: str = "move", ai_name: Optional[str] = None
+    file_info: "Any",
+    file_type: FileType,
+    action: str = "move",
+    ai_name: Optional[str] = None,
+    reprocess_processed: bool = False,
 ) -> bool:
     """Speichert eine Datei im Zielordner basierend auf Dateityp.
 
@@ -172,7 +196,7 @@ def _handle_storage(
 
         # Helper: ensure unique filename (append _1, _2 ...)
         def _ensure_unique_filename(p: Path) -> Path:
-            if not p.exists():
+            if not p.exists() or p.resolve() == path.resolve():
                 return p
             stem = p.stem
             suffix = p.suffix
@@ -195,20 +219,24 @@ def _handle_storage(
             # Ist der Zielordner (Jahres- oder Stadt-Ordner) voll, weicht die
             # Ablage auf den nächsten Jahres-Suffix-Ordner aus
             # (2026 -> 2026_1 -> 2026_2 ...).
-            idx = 0
-            while True:
-                year_name = year if idx == 0 else f"{year}_{idx}"
-                candidate = base.joinpath(year_name, *rel_parts)
-                if _count_direct_files(candidate) < max_files_per_folder:
-                    return candidate
-                idx += 1
+            with measure("storage.target_directory_selection") as measurement:
+                idx = 0
+                while True:
+                    year_name = year if idx == 0 else f"{year}_{idx}"
+                    candidate = base.joinpath(year_name, *rel_parts)
+                    direct_files = _count_direct_files(candidate)
+                    if direct_files < max_files_per_folder:
+                        measurement["year_overflow_index"] = idx
+                        measurement["direct_files_in_target"] = direct_files
+                        return candidate
+                    idx += 1
 
         # DOCUMENTS: verschiebe als Ganzes in base_docs
         if file_type in (FileType.DOCUMENT_IMAGE, FileType.TEXT_DOCUMENT):
             base_docs.mkdir(parents=True, exist_ok=True)
             file_hash = compute_sha256(path)
             # If identical file already exists in docs, skip moving
-            if is_hash_in_directory(file_hash, base_docs):
+            if not reprocess_processed and is_hash_in_directory(file_hash, base_docs):
                 logger.warning(
                     f"Datei bereits in Dokumenten-Ziel vorhanden, überspringe: {path.name}"
                 )
@@ -219,24 +247,25 @@ def _handle_storage(
             target = base_docs / path.name
             target = _ensure_unique_filename(target)
             logger.debug(f"Verschiebe Dokument: {path} -> {target} (action={action})")
-            if action == "copy":
-                shutil.copy2(str(path), str(target))
-            else:
-                shutil.move(str(path), str(target))
+            _transfer_file(path, target, action)
             register_file(target)
             return True
 
         # IMAGES and OTHER
         # Determine date and year
-        file_date = get_file_creation_date(path)
+        with measure("metadata.date_selection"):
+            file_date = get_file_creation_date(path)
         year = file_date.split("-")[0]
 
         # Try to determine country/city
         loc = None
-        try:
-            loc = get_country_city_from_file(path)
-        except Exception:
-            loc = None
+        if file_type == FileType.REAL_IMAGE:
+            try:
+                with measure("metadata.location_lookup") as measurement:
+                    loc = get_country_city_from_file(path)
+                    measurement["location_found"] = loc is not None
+            except Exception:
+                loc = None
 
         country = None
         city = None
@@ -252,7 +281,7 @@ def _handle_storage(
                 if ai_name:
                     stem = ai_name
                 else:
-                    stem = generate_smart_name(path)
+                    stem = generate_smart_name(path, file_type=file_type)
             except Exception:
                 stem = None
 
@@ -261,7 +290,8 @@ def _handle_storage(
             try:
                 from filemind.integrations.metadata_extractor import extract_metadata_name
 
-                meta_name = extract_metadata_name(path)
+                with measure("metadata.name_extraction"):
+                    meta_name = extract_metadata_name(path)
                 stem = Path(str(meta_name)).stem
             except Exception:
                 stem = path.stem
@@ -286,7 +316,7 @@ def _handle_storage(
 
         # If an identical file already exists in target_dir (by hash), skip copying
         file_hash = compute_sha256(path)
-        if is_hash_in_directory(file_hash, target_dir):
+        if not reprocess_processed and is_hash_in_directory(file_hash, target_dir):
             logger.warning(f"Identische Datei bereits im Ziel vorhanden, überspringe: {path.name}")
             register_file(path)
             _remember_duplicate(path)
@@ -299,10 +329,7 @@ def _handle_storage(
         target = _ensure_unique_filename(target)
 
         logger.debug(f"Verschiebe Datei: {path} -> {target} (action={action})")
-        if action == "copy":
-            shutil.copy2(str(path), str(target))
-        else:
-            shutil.move(str(path), str(target))
+        _transfer_file(path, target, action)
         register_file(target)
         return True
 
@@ -333,7 +360,7 @@ def _handle_ai_naming(file_info: "Any", file_type: FileType) -> Optional[str]:
         path = file_info.path
         logger.debug(f"Generiere intelligenten Namen: {path.name}")
 
-        smart_name = generate_smart_name(path)
+        smart_name = generate_smart_name(path, file_type=file_type)
         logger.info(f"Rohes Smart-Name-Ergebnis: {smart_name!r}")
 
         # If AI returned None (module disabled or error), propagate None
@@ -384,7 +411,9 @@ def _handle_ai_naming(file_info: "Any", file_type: FileType) -> Optional[str]:
         return None
 
 
-def route_file(path: Path, action: str = "move") -> bool:
+def _route_file_impl(
+    path: Path, action: str = "move", reprocess_processed: bool = False
+) -> bool:
     """Hauptfunktion: Klassifiziert und routet eine Datei.
 
     Diese Funktion ist das Herzstück des Routers. Sie:
@@ -419,13 +448,20 @@ def route_file(path: Path, action: str = "move") -> bool:
 
         # 0. Bereits gemeldete Duplikate still überspringen (spart
         # Klassifizierung, OCR und Hashing in jedem Poll-Durchgang)
-        if _is_known_duplicate(path):
+        if not reprocess_processed and _is_known_duplicate(path):
             logger.debug(f"Bekanntes Duplikat, überspringe: {path.name}")
+            return False
+
+        # Duplikate früh überspringen, bevor OCR oder andere Klassifizierungskosten anfallen.
+        if not reprocess_processed and _handle_deduplication(path):
             return False
 
         # 1. Klassifizierung
         logger.debug(f"Klassifiziere Datei: {path.name}")
-        classification = classify_file(path)
+        with measure("file.classification") as measurement:
+            classification = classify_file(path)
+            measurement["file_type"] = classification.file_type.value
+            measurement["confidence"] = classification.confidence
 
         logger.info(
             f"Klassifizierung: {path.name} -> {classification.file_type.value} "
@@ -439,39 +475,60 @@ def route_file(path: Path, action: str = "move") -> bool:
             # Try calling the storage handler with new signature; if tests monkeypatch
             # a simple fake that doesn't accept kwargs, fall back to positional call.
             try:
-                return _handle_storage(fi, ft, action=action_val, ai_name=ai_name_val)
+                return _handle_storage(
+                    fi,
+                    ft,
+                    action=action_val,
+                    ai_name=ai_name_val,
+                    reprocess_processed=reprocess_processed,
+                )
             except TypeError:
                 # Fallback: call as legacy signature
                 return _handle_storage(fi, ft)
 
-        # 2. Duplikat-Check (Meldung erfolgt einmalig in _handle_deduplication)
-        if _handle_deduplication(file_info):
-            # Datei nicht löschen; sie wurde bereits verarbeitet
-            return False
+        def _name_with_metrics(fi, ft):
+            with measure("file.ai_naming") as measurement:
+                result = _handle_ai_naming(fi, ft)
+                measurement["name_generated"] = result is not None
+                return result
+
+        def _store_with_metrics(fi, ft, action_val, ai_name_val=None):
+            with measure("file.storage", action=action_val) as measurement:
+                result = _call_storage_safe(fi, ft, action_val, ai_name_val)
+                measurement["storage_result"] = result
+                return result
 
         # 3. Dateitypabhängige Verarbeitung
         if file_type == FileType.DOCUMENT_IMAGE:
             logger.debug("Verarbeite als Dokumentenbild")
             _handle_ocr(file_info)
-            _call_storage_safe(file_info, file_type, action)
+            if _store_with_metrics(file_info, file_type, action) is False:
+                return False
 
         elif file_type == FileType.TEXT_DOCUMENT:
             logger.debug("Verarbeite als Textdokument")
-            _call_storage_safe(file_info, file_type, action)
+            if _store_with_metrics(file_info, file_type, action) is False:
+                return False
 
         elif file_type == FileType.REAL_IMAGE:
             logger.debug("Verarbeite als Bild")
             # Generiere intelligenten Namen (liefert Vorschlag, benennt nicht um)
-            ai_suggested = _handle_ai_naming(file_info, file_type)
+            ai_suggested = _name_with_metrics(file_info, file_type)
             # Speichere (verwende vorgeschlagenen Namen wenn vorhanden)
-            _call_storage_safe(file_info, file_type, action, ai_name_val=ai_suggested)
+            if _store_with_metrics(
+                file_info, file_type, action, ai_name_val=ai_suggested
+            ) is False:
+                return False
 
         elif file_type in (FileType.VIDEO, FileType.AUDIO, FileType.ARCHIVES, FileType.OTHER):
             logger.debug(f"Verarbeite als {file_type.value}")
             # Generiere intelligenten Namen (liefert Vorschlag, benennt nicht um)
-            ai_suggested = _handle_ai_naming(file_info, file_type)
+            ai_suggested = _name_with_metrics(file_info, file_type)
             # Speichere (verwende vorgeschlagenen Namen wenn vorhanden)
-            _call_storage_safe(file_info, file_type, action, ai_name_val=ai_suggested)
+            if _store_with_metrics(
+                file_info, file_type, action, ai_name_val=ai_suggested
+            ) is False:
+                return False
 
         logger.debug(f"Verarbeitung abgeschlossen: {path.name}")
         return True
@@ -479,3 +536,15 @@ def route_file(path: Path, action: str = "move") -> bool:
     except Exception as e:
         logger.error(f"Fehler beim Routing von {path}: {e}", exc_info=True)
         return False
+
+
+def route_file(
+    path: Path, action: str = "move", reprocess_processed: bool = False
+) -> bool:
+    """Classify and route one file while recording correlated stage metrics."""
+    path = Path(path)
+    with file_context(path):
+        with measure("file.route", action=action) as measurement:
+            result = _route_file_impl(path, action, reprocess_processed)
+            measurement["result"] = result
+            return result

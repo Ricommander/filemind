@@ -21,6 +21,7 @@ from typing import Iterable, Optional, Tuple
 from filemind.config import get_section
 from filemind.core.models import ClassificationResult, FileInfo, FileType
 from filemind.logging_utils.logger import get_logger
+from filemind.performance import measure
 
 logger = get_logger(__name__)
 
@@ -36,6 +37,7 @@ _IMAGE_EXTENSIONS: set[str] = {
     "heic",
     "heif",
     "gif",
+    "nef",
 }
 
 _TEXT_EXTENSIONS: set[str] = {"pdf", "doc", "docx", "odt", "txt", "md", "rtf"}
@@ -216,19 +218,24 @@ def _compute_colorfulness(path: Path) -> Optional[float]:
         import numpy as np
         from PIL import Image
 
-        with Image.open(path) as img:
-            img = img.convert("RGB")
-            # Für ein Farbmaß reicht eine verkleinerte Version - das hält die
-            # Analyse auch bei großen Fotos schnell.
-            img.thumbnail((512, 512))
-            arr = np.asarray(img, dtype="float32")
+        with measure("classification.color_analysis", bytes_processed=path.stat().st_size) as metrics:
+            with Image.open(path) as img:
+                img = img.convert("RGB")
+                # Für ein Farbmaß reicht eine verkleinerte Version - das hält die
+                # Analyse auch bei großen Fotos schnell.
+                img.thumbnail((512, 512))
+                arr = np.asarray(img, dtype="float32")
 
-        red, green, blue = arr[..., 0], arr[..., 1], arr[..., 2]
-        rg = red - green
-        yb = 0.5 * (red + green) - blue
-        std_root = float(np.sqrt(rg.std() ** 2 + yb.std() ** 2))
-        mean_root = float(np.sqrt(rg.mean() ** 2 + yb.mean() ** 2))
-        return std_root + 0.3 * mean_root
+            red, green, blue = arr[..., 0], arr[..., 1], arr[..., 2]
+            rg = red - green
+            yb = 0.5 * (red + green) - blue
+            std_root = float(np.sqrt(rg.std() ** 2 + yb.std() ** 2))
+            mean_root = float(np.sqrt(rg.mean() ** 2 + yb.mean() ** 2))
+            colorfulness = std_root + 0.3 * mean_root
+            metrics["colorfulness_value"] = colorfulness
+            metrics["image_width"] = arr.shape[1]
+            metrics["image_height"] = arr.shape[0]
+            return colorfulness
 
     except Exception as exc:
         logger.debug(f"Farbanalyse fehlgeschlagen für {path.name}: {exc}")
@@ -254,14 +261,24 @@ def _classify_image_type(path: Path) -> Tuple[FileType, float]:
     if word_count >= min_words:
         colorfulness = _compute_colorfulness(path)
         if colorfulness is None or colorfulness <= max_colorfulness:
-            color_repr = f"{colorfulness:.1f}" if colorfulness is not None else "n/a"
-            logger.debug(
-                f"{path.name}: {word_count} Wörter, Farbwert={color_repr} -> Dokumentenbild"
+            color_repr = f"{colorfulness:.1f}" if colorfulness is not None else "nicht verfügbar"
+            reason = (
+                "Farbwert liegt innerhalb der Schwelle"
+                if colorfulness is not None
+                else "Farbanalyse nicht verfügbar; Fallback bei ausreichendem OCR-Text"
+            )
+            logger.info(
+                f"Bildentscheidung: {path.name} | OCR-Wörter={word_count} "
+                f"(Dokument-Schwelle >= {min_words}) | Farbigkeit={color_repr} "
+                f"(Dokument-Schwelle <= {max_colorfulness:.1f}) | "
+                f"Ergebnis=Dokumentenbild (OCR-Verarbeitung) | Grund={reason}"
             )
             return FileType.DOCUMENT_IMAGE, 0.75
         logger.info(
-            f"{path.name}: viel Text ({word_count} Wörter), aber farbig "
-            f"(Farbwert={colorfulness:.1f} > {max_colorfulness}) -> als Foto behandelt"
+            f"Bildentscheidung: {path.name} | OCR-Wörter={word_count} "
+            f"(Dokument-Schwelle >= {min_words}) | Farbigkeit={colorfulness:.1f} "
+            f"(Dokument-Schwelle <= {max_colorfulness:.1f}) | Ergebnis=Foto | "
+            "Grund=Farbwert über der Dokument-Schwelle"
         )
         return FileType.REAL_IMAGE, 0.9
 
@@ -278,8 +295,27 @@ def _classify_image_type(path: Path) -> Tuple[FileType, float]:
         "page",
     )
     if any(token in name for token in doc_indicators):
-        return FileType.DOCUMENT_IMAGE, 0.75
-    if ext in {"tif", "tiff"}:
+        reason = "Dateiname enthält einen Scan-/Dokument-Hinweis"
+        file_type = FileType.DOCUMENT_IMAGE
+    elif ext in {"tif", "tiff"}:
+        reason = "TIFF-Endung als Scan-Fallback"
+        file_type = FileType.DOCUMENT_IMAGE
+    else:
+        reason = "zu wenige OCR-Wörter und kein Scan-/TIFF-Fallback"
+        file_type = FileType.REAL_IMAGE
+
+    result = (
+        "Dokumentenbild (OCR-Verarbeitung)"
+        if file_type == FileType.DOCUMENT_IMAGE
+        else "Foto"
+    )
+    logger.info(
+        f"Bildentscheidung: {path.name} | OCR-Wörter={word_count} "
+        f"(Dokument-Schwelle >= {min_words}) | Farbigkeit=nicht ermittelt "
+        f"(Dokument-Schwelle <= {max_colorfulness:.1f}; bei zu wenig OCR-Text nicht geprüft) | "
+        f"Ergebnis={result} | Grund={reason}"
+    )
+    if file_type == FileType.DOCUMENT_IMAGE:
         return FileType.DOCUMENT_IMAGE, 0.75
     return FileType.REAL_IMAGE, 0.9
 

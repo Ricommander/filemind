@@ -10,5 +10,5 @@ A modern daemon-based file organization system with support for:
 - Thread-safe logging and error handling
 """
 
-__version__ = "0.1.0"
+__version__ = "0.3.2"
 __author__ = "filemind"
