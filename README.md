@@ -201,33 +201,102 @@ python -m filemind.main --input-dir /path/to/watch
 python -m filemind.main --reinit-hash-store
 
 # Reprocess files already stored in the configured destinations once
-### Update a Remote Server and Download Logs
+python -m filemind.main --reprocess-processed
+```
 
-From Windows PowerShell, deploy the current runtime code to the systemd server
+### Remote Update and Logs
+
+The secured updater stages an isolated release and asks the root-owned server
+wrapper to switch releases. It replaces `/etc/filemind/config.yaml` with the
+bundled local `config.yaml`; the hash database, logs, storage, and previous
+releases are preserved. After the one-time server setup below, a manual update is:
+
+```powershell
 .\deploy\update-server.ps1
 ```
 
-replaces `/etc/filemind/config.yaml` by default; override that path with
-`-RemoteConfigPath` if your service uses another one. The hash database, logs,
-and virtual environment are not uploaded. The script interactively requests the
-sudo password for the SSH account before changing the service; that account
-must be allowed to run sudo commands on the server. Review the local config
-first: its settings, including `reprocess_processed`, become active on the
-server after deployment.
-
-Download the active and rotated application logs (`filemind.log*`) and
-performance logs (`performance.jsonl*`) and extract them locally:
+Download active and rotated application logs (`filemind.log*`) and performance
+logs (`performance.jsonl*`):
 
 ```powershell
-\.\deploy\download-filemind-logs.ps1
+.\deploy\download-logs.ps1
 ```
 
-The default remote log directory is `/opt/filemind/.filemind/logs`, based on
-the example configuration. If the server's `/etc/filemind/config.yaml` sets a
-different `logging.log_dir`, pass it with `-RemoteLogDirectory`. Both scripts
-use the SSH host alias `fritzleserver` by default and accept `-Server` to select
-another SSH host. Application logs can include file names and paths; review and
-redact them before sharing.
+The default log directory is `/opt/filemind/.filemind/logs`. The SSH account
+already has read access in the tested setup, so the downloader uses no sudo.
+Both scripts default to SSH alias `fritzleserver`. Logs can include personal
+filenames and paths; do not share them without considering their contents.
+
+### One-Time Server Setup
+
+The root installer migrates the existing service to `/opt/filemind/current`,
+preserves `/opt/filemind/.filemind` and `/etc/filemind/config.yaml`, installs
+ExifTool if needed, creates a non-login build user, and adds a `sudoers` rule
+that permits only the validated release wrapper. It briefly stops/restarts the
+service but does not replace the active config or modify `.filemind` data. Run
+these commands from the repository in PowerShell:
+
+```powershell
+scp.exe -o BatchMode=yes .\deploy\install-auto-deploy.sh .\deploy\filemind-deploy-wrapper.sh .\deploy\deploy_archive.py .\deploy\filemind.service fritzleserver:/tmp/
+ssh.exe -tt fritzleserver "sudo bash /tmp/install-auto-deploy.sh"
+```
+
+The second command asks for the server sudo password in the terminal. It is used
+only for this one-time installation and is neither saved nor given to Copilot.
+Afterward, verify the wrapper without changing server state:
+
+```powershell
+ssh.exe -o BatchMode=yes fritzleserver "sudo -n /usr/local/sbin/filemind-deploy --check"
+```
+
+### Daily Audit Runner
+
+`deploy/run-daily-audit.ps1` downloads recent logs, audits them in a persistent
+isolated Git worktree, runs the complete test suite, and requests further repairs
+after each test failure. Existing tests cannot be changed; new
+`tests/test_*.py` files are allowed. It deploys only after all tests pass and
+only when the runtime payload differs from the last successful deployment.
+Changes are not committed or pushed. Reports and the worktree live under
+`%LOCALAPPDATA%\filemind\daily-audit`.
+
+Install the standalone Copilot CLI and authenticate once. The runner recognizes
+the per-user binary at `%LOCALAPPDATA%\Programs\CopilotCLI\copilot.exe`:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\CopilotCLI\copilot.exe" login
+```
+
+Set the additional Copilot usage budget to `$0`; if included credits run out,
+the run stops without a paid fallback. The runner sends recent redacted log
+excerpts and test failures to Copilot, so register it only if you accept that
+upload. Redaction is best-effort. The agent has no shell or MCP tools; the
+outer runner executes tests and invokes the deploy script only after success.
+
+Before the first run, commit the reviewed repository changes so the main checkout
+is clean. Then perform a manual audit:
+
+```powershell
+pwsh -NoProfile -File .\deploy\run-daily-audit.ps1 -AllowLogUpload
+```
+
+After the one-time server setup, run the first full test-and-deploy pass manually:
+
+```powershell
+pwsh -NoProfile -File .\deploy\run-daily-audit.ps1 -AllowLogUpload -EnableDeploy
+```
+
+The runner checks the wrapper before uploading logs to Copilot. It deploys only
+after a green full suite and only when the runtime payload hash changed. Then
+register the daily 02:00 task with automatic deployment enabled:
+
+```powershell
+pwsh -NoProfile -File .\deploy\register-daily-audit.ps1 -EnableDeploy
+```
+
+The installer prompts for the Windows task account; Windows Task Scheduler
+stores that account, not the server sudo password. Use the same account that has
+Copilot CLI sign-in and the SSH key. Run the registered task once manually to
+verify its non-interactive credentials and report output.
 
 ### File Classification
 

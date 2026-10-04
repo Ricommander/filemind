@@ -14,8 +14,8 @@ Wants=network-online.target
 Type=simple
 User=filemind
 Group=filemind
-WorkingDirectory=/opt/filemind
-ExecStart=/opt/filemind/.venv/bin/python /opt/filemind/main.py --config /etc/filemind/config.yaml
+WorkingDirectory=/opt/filemind/current
+ExecStart=/opt/filemind/current/.venv/bin/python /opt/filemind/current/main.py --config /etc/filemind/config.yaml
 Restart=on-failure
 RestartSec=10
 # Give the daemon time to finish processing the current file on shutdown
