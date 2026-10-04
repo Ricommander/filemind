@@ -293,10 +293,12 @@ register the daily 02:00 task with automatic deployment enabled:
 pwsh -NoProfile -File .\deploy\register-daily-audit.ps1 -EnableDeploy
 ```
 
-The installer prompts for the Windows task account; Windows Task Scheduler
-stores that account, not the server sudo password. Use the same account that has
-Copilot CLI sign-in and the SSH key. Run the registered task once manually to
-verify its non-interactive credentials and report output.
+The task uses the currently signed-in Windows account with an interactive token;
+the installer does not ask for or store a Windows password. Keep that account
+signed in at the scheduled time (the screen may be locked). This allows the task
+to use the account's Copilot CLI sign-in and SSH key. Run it once manually and
+check `Get-ScheduledTaskInfo -TaskName 'filemind daily audit'` for a successful
+`LastTaskResult` of `0`.
 
 ### File Classification
 

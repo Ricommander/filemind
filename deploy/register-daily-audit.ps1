@@ -13,6 +13,15 @@ $repoRoot = if ($RepositoryPath) {
 } else {
     (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
+$git = Get-Command git.exe -ErrorAction Stop
+$gitStatus = & $git.Source -C $repoRoot status --porcelain 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not verify the repository status before task registration: $gitStatus"
+}
+if ($gitStatus) {
+    throw "Commit the reviewed repository changes before registering the daily task."
+}
+$automationRoot = Join-Path $env:LOCALAPPDATA "filemind\daily-audit"
 $runnerPath = Join-Path $PSScriptRoot "run-daily-audit.ps1"
 $pwshPath = Join-Path $PSHOME "pwsh.exe"
 if (-not (Test-Path $pwshPath -PathType Leaf)) {
@@ -37,6 +46,8 @@ $arguments = @(
     "-File"
     ('"{0}"' -f $runnerPath)
     "-AllowLogUpload"
+    "-AutomationRoot"
+    ('"{0}"' -f $automationRoot)
     "-CopilotCommand"
     ('"{0}"' -f $CopilotCommand)
 )
@@ -53,24 +64,19 @@ $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew `
     -ExecutionTimeLimit (New-TimeSpan -Hours 4)
-$credential = Get-Credential -Message "Windows account for the scheduled filemind audit task"
-$password = $credential.GetNetworkCredential().Password
+$identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+$principal = New-ScheduledTaskPrincipal `
+    -UserId $identity `
+    -LogonType Interactive `
+    -RunLevel Limited
 
-try {
-    Register-ScheduledTask `
-        -TaskName $TaskName `
-        -Action $action `
-        -Trigger $trigger `
-        -Settings $settings `
-        -User $credential.UserName `
-        -Password $password `
-        -RunLevel Limited `
-        -Description "Daily filemind log audit and tested repair run" `
-        -Force | Out-Null
-}
-finally {
-    $password = $null
-    $credential = $null
-}
+Register-ScheduledTask `
+    -TaskName $TaskName `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -Principal $principal `
+    -Description "Daily filemind log audit and tested repair run" `
+    -Force | Out-Null
 
-Write-Output "Registered '$TaskName' daily at $($DailyAt.ToString('HH:mm')). Run it once manually from Task Scheduler to verify CLI sign-in and SSH access."
+Write-Output "Registered '$TaskName' daily at $($DailyAt.ToString('HH:mm')) for the interactive account $identity. Keep this account signed in; the screen may be locked. No account password is stored by this installer."

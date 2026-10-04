@@ -191,30 +191,41 @@ try {
     $state = $null
     if (Test-Path $statePath) {
         $state = Get-Content $statePath -Raw | ConvertFrom-Json
-        $worktreeTop = (& $git.Source -C $worktreePath rev-parse --show-toplevel 2>$null)
-        if ($LASTEXITCODE -ne 0 -or [System.IO.Path]::GetFullPath($worktreeTop.Trim()) -ne [System.IO.Path]::GetFullPath($worktreePath)) {
-            throw "The saved automation worktree is missing or invalid."
-        }
         $lastDeployedDigest = [string]$state.LastDeployedDigest
-    }
+        $worktreeExists = Test-Path $worktreePath
+        if ($worktreeExists) {
+            $worktreeTop = (& $git.Source -C $worktreePath rev-parse --show-toplevel 2>$null)
+            if ($LASTEXITCODE -ne 0 -or [System.IO.Path]::GetFullPath($worktreeTop.Trim()) -ne [System.IO.Path]::GetFullPath($worktreePath)) {
+                throw "The saved automation worktree is invalid; refusing to remove it."
+            }
+        }
+        else {
+            & $git.Source -C $repoRoot worktree prune
+            if ($LASTEXITCODE -ne 0) {
+                throw "Could not prune stale git worktree metadata."
+            }
+        }
 
-    if ($state -and $state.BaseCommit -ne $mainHead) {
-        $worktreeStatus = @(& $git.Source -C $worktreePath status --porcelain --untracked-files=all)
-        if ($LASTEXITCODE -ne 0) {
-            throw "Could not inspect the saved automation worktree."
+        if (-not $worktreeExists -or $state.BaseCommit -ne $mainHead) {
+            if ($worktreeExists) {
+                $worktreeStatus = @(& $git.Source -C $worktreePath status --porcelain --untracked-files=all)
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Could not inspect the saved automation worktree."
+                }
+                if ($worktreeStatus) {
+                    throw "The main repository advanced, but the audit worktree contains uncommitted changes; preserve and reconcile them before continuing."
+                }
+                & $git.Source -C $repoRoot worktree remove $worktreePath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Could not remove the clean audit worktree based on the previous commit."
+                }
+                & $git.Source -C $repoRoot worktree prune
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Could not prune stale git worktree metadata."
+                }
+            }
+            $state = $null
         }
-        if ($worktreeStatus) {
-            throw "The main repository advanced, but the audit worktree contains uncommitted changes; preserve and reconcile them before continuing."
-        }
-        & $git.Source -C $repoRoot worktree remove $worktreePath
-        if ($LASTEXITCODE -ne 0) {
-            throw "Could not remove the clean audit worktree based on the previous commit."
-        }
-        & $git.Source -C $repoRoot worktree prune
-        if ($LASTEXITCODE -ne 0) {
-            throw "Could not prune stale git worktree metadata."
-        }
-        $state = $null
     }
 
     if (-not $state) {
