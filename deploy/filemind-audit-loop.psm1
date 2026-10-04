@@ -34,13 +34,9 @@ function Invoke-FilemindTestRepairLoop {
 
 function Get-FilemindCopilotArguments {
     [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Prompt
-    )
+    param()
 
     return @(
-        "-p", $Prompt,
         "--allow-all-tools",
         "--available-tools=view,glob,grep,edit,create,apply_patch,skill",
         "--deny-tool=shell",
@@ -78,4 +74,55 @@ function Get-FilemindRuntimePayloadDigest {
     }
 }
 
-Export-ModuleMember -Function Invoke-FilemindTestRepairLoop, Get-FilemindCopilotArguments, Get-FilemindRuntimePayloadDigest
+function Invoke-FilemindPromptProcess {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ExecutablePath,
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments,
+        [Parameter(Mandatory = $true)]
+        [string]$Prompt,
+        [ValidateRange(1, 7200)]
+        [int]$TimeoutSeconds = 1800
+    )
+
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $startInfo.FileName = $ExecutablePath
+    $startInfo.WorkingDirectory = $WorkingDirectory
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardInput = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $Arguments | ForEach-Object { $startInfo.ArgumentList.Add($_) }
+
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $startInfo
+    try {
+        if (-not $process.Start()) {
+            throw "Could not start process '$ExecutablePath'."
+        }
+        $stdout = $process.StandardOutput.ReadToEndAsync()
+        $stderr = $process.StandardError.ReadToEndAsync()
+        $process.StandardInput.WriteLine($Prompt)
+        $process.StandardInput.Close()
+        if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+            $process.Kill()
+            $process.WaitForExit()
+            throw "Process '$ExecutablePath' timed out after $TimeoutSeconds seconds."
+        }
+        $process.WaitForExit()
+        return [pscustomobject]@{
+            ExitCode = $process.ExitCode
+            Output = $stdout.GetAwaiter().GetResult() + $stderr.GetAwaiter().GetResult()
+        }
+    }
+    finally {
+        $process.Dispose()
+    }
+}
+
+Export-ModuleMember -Function Invoke-FilemindTestRepairLoop, Get-FilemindCopilotArguments, Get-FilemindRuntimePayloadDigest, Invoke-FilemindPromptProcess

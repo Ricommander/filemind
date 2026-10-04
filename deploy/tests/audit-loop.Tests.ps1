@@ -40,7 +40,7 @@ Describe "Invoke-FilemindTestRepairLoop" {
 
 Describe "Get-FilemindCopilotArguments" {
     It "uses the current non-interactive CLI with no shell, MCP, or user-question tools" {
-        $arguments = Get-FilemindCopilotArguments -Prompt "audit prompt"
+        $arguments = Get-FilemindCopilotArguments
         $availableTools = $arguments | Where-Object { $_ -like "--available-tools=*" }
 
         (@($arguments) -contains "--allow-all-tools") | Should Be $true
@@ -48,7 +48,8 @@ Describe "Get-FilemindCopilotArguments" {
         (@($arguments) -contains "--disable-builtin-mcps") | Should Be $true
         (@($arguments) -contains "--no-ask-user") | Should Be $true
         $availableTools | Should Be "--available-tools=view,glob,grep,edit,create,apply_patch,skill"
-        (@($arguments) -contains "audit prompt") | Should Be $true
+        (@($arguments) -contains "-p") | Should Be $false
+        ($arguments | Where-Object { $_.Length -gt 4096 }).Count | Should Be 0
     }
 }
 
@@ -74,5 +75,29 @@ Describe "Get-FilemindRuntimePayloadDigest" {
         finally {
             Remove-Item -Path $root -Recurse -Force -ErrorAction SilentlyContinue
         }
+    }
+}
+
+Describe "Invoke-FilemindPromptProcess" {
+    It "streams a large prompt over stdin instead of process arguments" {
+        $pwshPath = Join-Path $PSHOME "pwsh.exe"
+        $prompt = "x" * 50000
+        $arguments = @(
+            "-NoLogo"
+            "-NoProfile"
+            "-NonInteractive"
+            "-Command"
+            "[Console]::Out.Write([Console]::In.ReadToEnd())"
+        )
+
+        $result = Invoke-FilemindPromptProcess `
+            -ExecutablePath $pwshPath `
+            -WorkingDirectory $PWD.Path `
+            -Arguments $arguments `
+            -Prompt $prompt `
+            -TimeoutSeconds 30
+
+        $result.ExitCode | Should Be 0
+        $result.Output.TrimEnd([char[]]"`r`n") | Should Be $prompt
     }
 }

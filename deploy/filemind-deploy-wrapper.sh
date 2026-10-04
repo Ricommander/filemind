@@ -108,6 +108,10 @@ archive_size="$(stat -c '%s' -- "$archive")"
 [[ ! -e "$staging" && ! -e "$release" && ! -e "$link_tmp" ]] || fail "release ID already exists"
 [[ -d "$SHARED_STATE" && ! -L "$SHARED_STATE" ]] || fail "shared state directory is missing"
 [[ -f "$CONFIG_PATH" ]] || fail "active config is missing"
+previous_release="$(readlink -f -- "$CURRENT_LINK")"
+[[ "$previous_release" == "$RELEASES_DIR/"* ]] || fail "current release points outside the releases directory"
+[[ -f "$previous_release/requirements.txt" && -x "$previous_release/.venv/bin/python" ]] ||
+    fail "current release dependency environment is incomplete"
 
 mkdir -p -- "$RELEASES_DIR"
 install -d -o root -g "$SERVICE_GROUP" -m 0750 -- "$config_backup_dir"
@@ -119,9 +123,15 @@ ln -s "$SHARED_STATE" "$staging/.filemind"
 chown -R "$DEPLOY_USER:$DEPLOY_USER" "$staging"
 find "$staging" -type d -exec chmod 0700 {} +
 find "$staging" -type f -exec chmod 0600 {} +
-runuser -u "$DEPLOY_USER" -- python3 -m venv "$staging/.venv"
-runuser -u "$DEPLOY_USER" -- env PIP_NO_CACHE_DIR=1 \
-    "$staging/.venv/bin/python" -m pip install -r "$staging/requirements.txt"
+if cmp -s -- "$previous_release/requirements.txt" "$staging/requirements.txt"; then
+    ln -s "$previous_release/.venv" "$staging/.venv"
+else
+    install -d -o "$DEPLOY_USER" -g "$DEPLOY_USER" -m 0700 -- "$staging/.tmp"
+    runuser -u "$DEPLOY_USER" -- python3 -m venv "$staging/.venv"
+    runuser -u "$DEPLOY_USER" -- env TMPDIR="$staging/.tmp" PIP_NO_CACHE_DIR=1 \
+        "$staging/.venv/bin/python" -m pip install -r "$staging/requirements.txt"
+    rm -rf -- "$staging/.tmp"
+fi
 
 chown -R "root:$SERVICE_GROUP" "$staging"
 find "$staging" -type d -exec chmod 0750 {} +

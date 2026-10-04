@@ -4,6 +4,7 @@ param(
     [string]$AutomationRoot,
     [string]$CopilotCommand = "copilot",
     [string]$PythonExecutable,
+    [string]$MutexName = "Local\filemind-daily-audit",
     [ValidateRange(60, 7200)]
     [int]$CopilotTimeoutSeconds = 1800,
     [switch]$EnableDeploy,
@@ -41,7 +42,7 @@ $worktreePath = Join-Path $AutomationRoot "worktree"
 $statePath = Join-Path $AutomationRoot "state.json"
 $runId = "$(Get-Date -Format 'yyyyMMdd-HHmmss')-$([guid]::NewGuid().ToString('N').Substring(0, 8))"
 $runDirectory = Join-Path (Join-Path $AutomationRoot "runs") $runId
-$mutex = [System.Threading.Mutex]::new($false, "Local\filemind-daily-audit")
+$mutex = [System.Threading.Mutex]::new($false, $MutexName)
 $ownsMutex = $false
 
 function Invoke-Git {
@@ -129,40 +130,14 @@ function Invoke-CopilotPrompt {
         [string]$OutputPath
     )
 
-    $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
-    $startInfo.FileName = $copilot.Source
-    $startInfo.WorkingDirectory = $worktreePath
-    $startInfo.UseShellExecute = $false
-    $startInfo.CreateNoWindow = $true
-    $startInfo.RedirectStandardInput = $true
-    $startInfo.RedirectStandardOutput = $true
-    $startInfo.RedirectStandardError = $true
-    Get-FilemindCopilotArguments -Prompt $Prompt |
-        ForEach-Object { $startInfo.ArgumentList.Add($_) }
-
-    $process = [System.Diagnostics.Process]::new()
-    $process.StartInfo = $startInfo
-    try {
-        if (-not $process.Start()) {
-            throw "Could not start Copilot CLI."
-        }
-        $stdout = $process.StandardOutput.ReadToEndAsync()
-        $stderr = $process.StandardError.ReadToEndAsync()
-        $process.StandardInput.Close()
-        if (-not $process.WaitForExit($CopilotTimeoutSeconds * 1000)) {
-            $process.Kill()
-            $process.WaitForExit()
-            $output = "Copilot CLI timed out after $CopilotTimeoutSeconds seconds."
-            Set-Content -Path $OutputPath -Value $output -Encoding utf8
-            throw $output
-        }
-        $process.WaitForExit()
-        $output = $stdout.GetAwaiter().GetResult() + $stderr.GetAwaiter().GetResult()
-        $exitCode = $process.ExitCode
-    }
-    finally {
-        $process.Dispose()
-    }
+    $result = Invoke-FilemindPromptProcess `
+        -ExecutablePath $copilot.Source `
+        -WorkingDirectory $worktreePath `
+        -Arguments (Get-FilemindCopilotArguments) `
+        -Prompt $Prompt `
+        -TimeoutSeconds $CopilotTimeoutSeconds
+    $output = $result.Output
+    $exitCode = $result.ExitCode
     Set-Content -Path $OutputPath -Value $output -Encoding utf8
     if ($exitCode -ne 0) {
         throw "Copilot CLI failed with exit code ${exitCode}: $output"
@@ -213,24 +188,36 @@ try {
 
     $mainHead = ([string](Invoke-Git @("rev-parse", "HEAD"))).Trim()
     $lastDeployedDigest = ""
+    $state = $null
     if (Test-Path $statePath) {
         $state = Get-Content $statePath -Raw | ConvertFrom-Json
-        if ($state.BaseCommit -ne $mainHead) {
-            throw "The main repository changed since the automation worktree was created; reconcile it before continuing."
-        }
         $worktreeTop = (& $git.Source -C $worktreePath rev-parse --show-toplevel 2>$null)
         if ($LASTEXITCODE -ne 0 -or [System.IO.Path]::GetFullPath($worktreeTop.Trim()) -ne [System.IO.Path]::GetFullPath($worktreePath)) {
             throw "The saved automation worktree is missing or invalid."
         }
-        $approvedTests = @{}
-        if ($state.ApprovedTests) {
-            $state.ApprovedTests.PSObject.Properties | ForEach-Object {
-                $approvedTests[$_.Name] = [string]$_.Value
-            }
-        }
         $lastDeployedDigest = [string]$state.LastDeployedDigest
     }
-    else {
+
+    if ($state -and $state.BaseCommit -ne $mainHead) {
+        $worktreeStatus = @(& $git.Source -C $worktreePath status --porcelain --untracked-files=all)
+        if ($LASTEXITCODE -ne 0) {
+            throw "Could not inspect the saved automation worktree."
+        }
+        if ($worktreeStatus) {
+            throw "The main repository advanced, but the audit worktree contains uncommitted changes; preserve and reconcile them before continuing."
+        }
+        & $git.Source -C $repoRoot worktree remove $worktreePath
+        if ($LASTEXITCODE -ne 0) {
+            throw "Could not remove the clean audit worktree based on the previous commit."
+        }
+        & $git.Source -C $repoRoot worktree prune
+        if ($LASTEXITCODE -ne 0) {
+            throw "Could not prune stale git worktree metadata."
+        }
+        $state = $null
+    }
+
+    if (-not $state) {
         $mainStatus = Invoke-Git @("status", "--porcelain")
         if ($mainStatus) {
             throw "The main repository must be clean before creating the automation worktree."
@@ -248,6 +235,14 @@ try {
         } |
             ConvertTo-Json -Depth 5 |
             Set-Content -Path $statePath -Encoding utf8
+    }
+    else {
+        $approvedTests = @{}
+        if ($state.ApprovedTests) {
+            $state.ApprovedTests.PSObject.Properties | ForEach-Object {
+                $approvedTests[$_.Name] = [string]$_.Value
+            }
+        }
     }
 
     $downloadDirectory = Join-Path $runDirectory "server-logs"

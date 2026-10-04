@@ -14,7 +14,10 @@ $repoRoot = if ($RepositoryPath) {
     (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
 $runnerPath = Join-Path $PSScriptRoot "run-daily-audit.ps1"
-$pwsh = Get-Command pwsh.exe -CommandType Application -ErrorAction Stop
+$pwshPath = Join-Path $PSHOME "pwsh.exe"
+if (-not (Test-Path $pwshPath -PathType Leaf)) {
+    throw "Current PowerShell executable not found: $pwshPath"
+}
 if (-not $CopilotCommand) {
     $installedCopilot = Join-Path $env:LOCALAPPDATA "Programs\CopilotCLI\copilot.exe"
     $CopilotCommand = if (Test-Path $installedCopilot -PathType Leaf) { $installedCopilot } else { "copilot" }
@@ -42,7 +45,7 @@ if ($EnableDeploy) {
 }
 
 $action = New-ScheduledTaskAction `
-    -Execute $pwsh.Source `
+    -Execute $pwshPath `
     -Argument ($arguments -join " ") `
     -WorkingDirectory $repoRoot
 $trigger = New-ScheduledTaskTrigger -Daily -At $DailyAt

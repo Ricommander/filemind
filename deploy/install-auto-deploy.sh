@@ -3,6 +3,7 @@ set -Eeuo pipefail
 umask 022
 
 readonly INSTALL_ROOT="/opt/filemind"
+readonly CURRENT_LINK="$INSTALL_ROOT/current"
 readonly CONFIG_PATH="/etc/filemind/config.yaml"
 readonly SERVICE_NAME="filemind"
 readonly SERVICE_USER="filemind"
@@ -32,7 +33,6 @@ getent group "$DEPLOY_GROUP" >/dev/null || fail "deployment build group is missi
 [[ -x "$INSTALL_ROOT/.venv/bin/python" ]] || fail "existing virtual environment is missing"
 [[ -d "$INSTALL_ROOT/.filemind" && ! -L "$INSTALL_ROOT/.filemind" ]] || fail "existing shared state directory is missing or is a symlink"
 [[ -f "$CONFIG_PATH" ]] || fail "active configuration is missing at $CONFIG_PATH"
-[[ ! -e "$INSTALL_ROOT/current" && ! -L "$INSTALL_ROOT/current" ]] || fail "a current-release link already exists; refusing to migrate twice"
 [[ -f "$(dirname "$0")/filemind-deploy-wrapper.sh" ]] || fail "filemind-deploy-wrapper.sh must be beside this installer"
 [[ -f "$(dirname "$0")/filemind.service" ]] || fail "filemind.service must be beside this installer"
 [[ -f "$(dirname "$0")/deploy_archive.py" ]] || fail "deploy_archive.py must be beside this installer"
@@ -45,6 +45,36 @@ if ! command -v exiftool >/dev/null 2>&1; then
     apt-get update
     apt-get install -y libimage-exiftool-perl
 fi
+
+if [[ -L "$CURRENT_LINK" ]]; then
+    current_target="$(readlink -f -- "$CURRENT_LINK")"
+    [[ "$current_target" == "$INSTALL_ROOT/releases/"* ]] || fail "current release points outside the releases directory"
+    [[ -f "$UNIT_PATH" ]] || fail "current-release service unit is missing"
+    grep -Fq "WorkingDirectory=$CURRENT_LINK" "$UNIT_PATH" || fail "service unit does not use the current-release layout"
+
+    install -o root -g root -m 0750 \
+        "$(dirname "$0")/filemind-deploy-wrapper.sh" "$WRAPPER_PATH"
+    install -d -o root -g root -m 0755 /usr/local/libexec
+    install -o root -g root -m 0644 \
+        "$(dirname "$0")/deploy_archive.py" "$ARCHIVE_VALIDATOR_PATH"
+    install -d -o root -g root -m 0700 /var/backups/filemind-deploy/config
+
+    sudoers_tmp="$(mktemp /etc/sudoers.d/.filemind-deploy.XXXXXX)"
+    trap 'rm -f -- "$sudoers_tmp"' EXIT
+    {
+        printf '%s ALL=(root) NOPASSWD: %s --check\n' "$SUDO_USER" "$WRAPPER_PATH"
+        printf '%s ALL=(root) NOPASSWD: %s --deploy\n' "$SUDO_USER" "$WRAPPER_PATH"
+    } > "$sudoers_tmp"
+    chmod 0440 "$sudoers_tmp"
+    visudo -cf "$sudoers_tmp"
+    install -o root -g root -m 0440 "$sudoers_tmp" "$SUDOERS_PATH"
+    "$WRAPPER_PATH" --check
+    trap - EXIT
+    rm -f -- "$sudoers_tmp"
+    printf 'Updated protected deploy helpers for SSH user %s; current release and service were not changed.\n' "$SUDO_USER"
+    exit 0
+fi
+[[ ! -e "$CURRENT_LINK" ]] || fail "current-release path exists but is not a symlink"
 
 # The daemon may write only shared runtime state, never the release pointer.
 chown root:root "$INSTALL_ROOT"

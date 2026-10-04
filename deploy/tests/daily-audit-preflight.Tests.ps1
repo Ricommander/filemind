@@ -1,13 +1,14 @@
 Describe "run-daily-audit preflight" {
     It "records the missing log-upload consent without contacting the server" {
-        $pwsh = Get-Command pwsh -ErrorAction Stop
+        $pwshPath = Join-Path $PSHOME "pwsh.exe"
         $script = Join-Path $PSScriptRoot "..\run-daily-audit.ps1"
         $root = Join-Path ([System.IO.Path]::GetTempPath()) ("filemind-audit-test-" + [guid]::NewGuid().ToString("N"))
+        $mutexName = "Local\filemind-audit-test-$([guid]::NewGuid().ToString('N'))"
         $copilotExecutable = Join-Path $env:SystemRoot "System32\where.exe"
 
         try {
-            & $pwsh.Source -NoProfile -File $script -AutomationRoot $root `
-                -CopilotCommand $copilotExecutable *> $null
+            & $pwshPath -NoProfile -File $script -AutomationRoot $root `
+            -CopilotCommand $copilotExecutable -MutexName $mutexName *> $null
             $exitCode = $LASTEXITCODE
             $report = Get-ChildItem (Join-Path $root "runs") -Filter "report.txt" -Recurse |
                 Select-Object -First 1
